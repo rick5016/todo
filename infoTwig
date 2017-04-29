@@ -1,0 +1,17 @@
+https://openclassrooms.com/courses/developpez-votre-site-web-avec-le-framework-symfony2/le-moteur-de-templates-twig
+
+Précisions sur la syntaxe {{ objet.attribut }}
+
+Le fonctionnement de la syntaxe {{ objet.attribut }} est un peu plus complexe qu'elle n'en a l'air. Elle ne fait pas seulement objet->getAttribut. En réalité, voici ce qu'elle fait exactement :
+
+    Elle vérifie si objet est un tableau, et si attribut est un index valide. Si c'est le cas, elle affiche objet['attribut'].
+
+    Sinon, et si objet est un objet, elle vérifie si attribut est un attribut valide (public donc). Si c'est le cas, elle affiche objet->attribut.
+
+    Sinon, et si objet est un objet, elle vérifie si attribut() est une méthode valide (publique donc). Si c'est le cas, elle affiche objet->attribut().
+
+    Sinon, et si objet est un objet, elle vérifie si getAttribut() est une méthode valide. Si c'est le cas, elle affiche objet->getAttribut().
+
+    Sinon, et si objet est un objet, elle vérifie si isAttribut() est une méthode valide. Si c'est le cas, elle affiche objet->isAttribut().
+
+    Sinon, elle n'affiche rien et retourne null.
