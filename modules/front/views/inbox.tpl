@@ -18,36 +18,37 @@
         <span{% if priority|slice(4, 1) == '1' %} class="btn btn-info"{% else %} class="btn btn-default"{% endif %}>Priorité 4</span>
     </a>
 </div>
-
-<script>
-  $(function() {
-    $('#past').change(function() {
-      $("#filtrer").submit();
-    })
-    $('#ant').change(function() {
-      $("#filtrer").submit();
-    })
-  })
-</script>
-<form method="post" id="filtrer">
-    <div>
-        <label class="checkbox-inline" value="">
-            <input alt="test" data-toggle="toggle" {% if past is defined %}checked{% endif %} type="checkbox" name="past" id="past" /> Tâches non accomplies dans le passé
+{% if today is not defined %}
+    <script>
+      $(function() {
+        $('#past').change(function() {
+          $("#filtrer").submit();
+        })
+        $('#ant').change(function() {
+          $("#filtrer").submit();
+        })
+      })
+    </script>
+    <form method="post" id="filtrer">
+        <div>
+            <label class="checkbox-inline" value="">
+                <input alt="test" data-toggle="toggle" {% if past is defined %}checked{% endif %} type="checkbox" name="past" id="past" /> Tâches non accomplies dans le passé
+            </label>
+        </div>
+        <div>
+        <label class="checkbox-inline">
+            <input data-toggle="toggle" {% if end is defined %}checked{% endif %} type="checkbox" name="end" id="end" disabled /> Tâche(s) Finie(s) aujourd'hui
         </label>
-    </div>
-    <div>
-    <label class="checkbox-inline">
-        <input data-toggle="toggle" {% if end is defined %}checked{% endif %} type="checkbox" name="end" id="end" disabled /> Tâche(s) Finie(s) aujourd'hui
-    </label>
-    <div>
-    </div>
-    <label class="checkbox-inline">
-        <input data-toggle="toggle" {% if ant is defined %}checked{% endif %} type="checkbox" name="ant" id="ant" /> Prochaines Tâches
-    </label>
-    </div>
-    <input type="hidden" value="Filtrer" name="filtrer" />
-</form>
-    <hr />
+        <div>
+        </div>
+        <label class="checkbox-inline">
+            <input data-toggle="toggle" {% if ant is defined %}checked{% endif %} type="checkbox" name="ant" id="ant" /> Prochaines Tâches
+        </label>
+        </div>
+        <input type="hidden" value="Filtrer" name="filtrer" />
+    </form>
+{% endif %}
+<hr />
 {% if tasks is empty %}
 <ul>
     <li style="list-style-type:none;"><h3>{{ "now"|date('Y', timezone="Europe/Paris") }}</h3></li>
@@ -69,29 +70,19 @@
         <hr />
         {% set displayHr = false %}
     {% endif %}
-        
-    <!-- Gestion de l'affichage de l'année : TODO à tester -->
-    {% if annee != dateStart|date('Y', timezone="Europe/Paris") %}
-        {% if annee is not empty %}
-            <ul>
-        {% endif %}
-        <ul>
-        {% set annee = dateStart|date('Y', timezone="Europe/Paris") %}
-        <li style="list-style-type:none;"><h3>{{ annee }}</h3></li>
-    {% endif %}
 
-    <!-- Gestion de l'affichage du mois et du jour : TODO proposer différent mode d'affichage -->
+    <!-- Gestion de l'affichage du mois et du jour -->
     {% if jourMois != dateStart|date('d/m', timezone="Europe/Paris") %}
         </ul><ul>
         {% if dateStart|date('d/m/Y', timezone="Europe/Paris") == "now"|date('d/m/Y', timezone="Europe/Paris") %}
-            {% set display = dateStart|date('d/m', timezone="Europe/Paris") ~ " - Aujourd'hui" %}
+            {% set display = "Aujourd'hui" %}
         {% elseif dateStart|date('d/m/Y', timezone="Europe/Paris") == "tomorrow"|date('d/m/Y', timezone="Europe/Paris") %}
-            {% set display = dateStart|date('d/m', timezone="Europe/Paris") ~ " - Demain" %}
+            {% set display = "Demain" %}
         {% else %}
-            {% set display = dateStart|date('d/m', timezone="Europe/Paris") %}
+            {% set display = "" %}
         {% endif %}
         {% set jourMois = dateStart|date('d/m', timezone="Europe/Paris") %}
-        <li style="list-style-type:none;"><h4>{{ display }}</h4></li>
+        <li style="list-style-type:none;"><span style="font-size: 18px;font-weight: 500;line-height: 1.1;">{{ display }}</span> <span>{{ dateStart|date('d/m/Y', timezone="Europe/Paris") }}</span></li>
     {% endif %}
 
     <ul>

@@ -96,7 +96,12 @@ function inbox($vars)
 {
     include_once('modules/front/form/filtres.php');
     $filtres = new filtres();
-    $vars = $filtres->check($_POST, $vars);
+    if (isset($_GET['filtre']) && $_GET['filtre'] == "today") {
+        $vars['today'] = true;
+        $vars = $filtres->check(array('filtrer' => true), $vars, false);
+    } else {
+        $vars = $filtres->check($_POST, $vars);
+    }
 
     $returns = array();
     $where = array();
@@ -115,7 +120,7 @@ function inbox($vars)
         $calendar->dateStart = $date->format('Y-m-d');
         $performes = $calendar->getPerformes();
         
-        if (!isset($_SESSION['voir_tache_futur']) && $calendar->dateStart > date('Y-m-d')) {
+        if (!isset($vars['ant']) && $calendar->dateStart > date('Y-m-d')) {
             $afficher_la_tache = false;
         }
         
@@ -127,7 +132,7 @@ function inbox($vars)
             }
             $dateTimeAffichage = new DateTime($date_affichage);
             $calendar->dateAffichage = $dateTimeAffichage->format('Y-m-d');
-            if (!isset($_SESSION['voir_tache_ancienne']) && ($calendar->dateAffichage < date('Y-m-d'))) {
+            if (!isset($vars['past']) && ($calendar->dateAffichage < date('Y-m-d'))) {
                 $afficher_la_tache = false;
             }
             if ($afficher_la_tache) {

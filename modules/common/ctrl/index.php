@@ -27,6 +27,10 @@ if (isset($_GET['page']))
     {
         $vars = $func($vars);
     }
+    elseif ($_GET['page'] == "today")
+    {
+        $vars = $func($vars);
+    }
     elseif ($_GET['page'] == "del" && isset($_GET['id']))
     {
         $func(); 

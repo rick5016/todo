@@ -10,44 +10,40 @@ class filtres extends form
         $this->add('checkbox', 'ant');
     }
     
-    function check($datas, $vars)
+    function check($datas, $vars, $save = true)
     {
-        if (isset($datas['filtrer']))
+        // Voir les tâches avant
+        if (isset($datas['past']) && isset($datas['filtrer']))
         {
-            if (isset($datas['past']))
-            {
-                $vars['past'] = true;
+            $vars['past'] = true;
+            if ($save)
                 $_SESSION['voir_tache_ancienne'] = true;
-            }
-            else {
-                unset($_SESSION['voir_tache_ancienne']);
-            }
-            if (isset($datas['end']))
-            {
-                $vars['end'] = true;
-                $_SESSION['voir_tache_effectue'] = true;
-            }
-            else {
-                unset($_SESSION['voir_tache_effectue']);
-            }
-            if (isset($datas['ant']))
-            {
-                $vars['ant'] = true;
-                $_SESSION['voir_tache_futur'] = true;
-            }
-            else {
-                unset($_SESSION['voir_tache_futur']);
-            }
         }
-        if (isset($_SESSION['voir_tache_ancienne']))
+        elseif(isset($datas['filtrer']))
+        {
+            if ($save)
+                unset($_SESSION['voir_tache_ancienne']);
+        }
+        elseif (isset($_SESSION['voir_tache_ancienne']) && $save)
         {
             $vars['past'] = true;
         }
-        if (isset($_SESSION['voir_tache_effectue']))
+        
+        // Voir les tâches après
+        if (isset($datas['ant']) && isset($datas['filtrer']))
         {
-            $vars['end'] = true;
+            $vars['ant'] = true;
+            if ($save) {
+                $_SESSION['voir_tache_futur'] = true;
+            }
         }
-        if (isset($_SESSION['voir_tache_futur']))
+        elseif(isset($datas['filtrer']))
+        {
+            if ($save) {
+                unset($_SESSION['voir_tache_futur']);
+            }
+        }
+        elseif(isset($_SESSION['voir_tache_futur']) && $save)
         {
             $vars['ant'] = true;
         }
