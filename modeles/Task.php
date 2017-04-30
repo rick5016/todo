@@ -8,7 +8,9 @@ class Task extends BDD
     protected $attributs = array(
         'id'        => 'id',
         'name'      => 'name',
-        'priority'  => 'priority'
+        'priority'  => 'priority',
+        'created'   => 'created',
+        'updated'   => 'updated'
     );
     protected $primary_key = 'id';
     protected $foreign_keys = array(
@@ -48,31 +50,56 @@ class Task extends BDD
         }
     }
     
-    function loadInbox($foreing_keys = false, $where = array(), $orderby = '')
+    function loadInbox($priority = "11111")
     {
+        $result = array();
+        if ($priority == "00000") {
+            return $result;
+        }
         try {
             $query = 'select 
-                task.id as task_id, name, priority, 
-                calendar.id as calendar_id, idtask, dateCreateCalendar, dateStart, dateEnd, reiterate, interspace, reiterateEnd, untilDate, untilNumber, 
-                performe.id as performe_id, idcalendar, dateCreate, dateUpdate 
+                task.id as task_id, name, priority, task.created as task_created, task.updated as task_updated, 
+                calendar.id as calendar_id, idtask, dateStart, dateEnd, reiterate, interspace, reiterateEnd, untilDate, untilNumber, calendar.created as calendar_created, calendar.updated as calendar_updated, 
+                performe.id as performe_id, idcalendar, performe.created as performe_created, performe.updated as performe_updated
                 from task
                 left join calendar on task.id = calendar.idtask
-                left join performe on calendar.id = performe.idcalendar and performe.dateCreate = 
+                left join performe on calendar.id = performe.idcalendar and performe.created = 
                 (
                         SELECT
-                    MAX(dateCreate)
+                    MAX(created)
                     FROM performe
                     where performe.idcalendar = calendar.id
                     limit 1
                 )
-                where (reiterate != 0 OR (reiterate = 0 AND performe.id is null)) 
-                order by dateStart, priority, performe_id desc';
-            echo $query;
+                where (reiterate != 0 OR (reiterate = 0 AND performe.id is null))';
+            if ($priority != "11111")
+            {
+                $query .= " and priority IN (";
+                if (substr($priority, 0, 1) == '1') {
+                    $query .= '0,';
+                }
+                if (substr($priority, 1, 1) == '1') {
+                    $query .= '1,';
+                }
+                if (substr($priority, 2, 1) == '1') {
+                    $query .= '2,';
+                }
+                if (substr($priority, 3, 1) == '1') {
+                    $query .= '3,';
+                }
+                if (substr($priority, 4, 1) == '1') {
+                    $query .= '4,';
+                }
+                $query = substr($query, 0, -1);
+                $query .= ')';
+            }
+            $query .= ' order by dateStart, priority, performe_id desc';
+
             $stmt  = $this->dbh->query($query);
             if ($stmt)
             {
                 while ($data = $stmt->fetch()) {
-                    $result[] = new $this->bdd_name($data, $foreing_keys);
+                    $result[] = new $this->bdd_name($data, true);
                 }
             }
         }

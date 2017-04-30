@@ -21,11 +21,11 @@
         Toute la journée <input type="checkbox" id="allDay" name="allDay" value="1" /><br />
         <div style="float:left;width:100px;">Début </div>
         <div style="float:left;"><input type="text" name="dateStart" id="dateStart" value="{% if dateStart is not empty %}{{ dateStart }}{% else %}{{ "now"|date('d/m/Y', timezone="Europe/Paris") }}{% endif %}" /> </div>
-        <div style="float:left;"><input type="text" size="2" name="timeStart" id="timeStart" value="{% if timeStart is not empty %}{{ timeStart|date('H:i', timezone="Europe/Paris") }}{% endif %}"/></div>
+        <div style="float:left;"><input type="text" size="2" name="timeStart" id="timeStart" value="{% if timeStart is not empty %}{{ timeStart }}{% endif %}"/></div>
         <div style="clear:both;padding: 0;"></div>
         <div style="float:left;width:100px;">Fin </div>
         <div style="float:left;"><input type="text" name="dateEnd" id="dateEnd" value="{% if dateEnd is not empty %}{{ dateEnd }}{% else %}{{ "now"|date('d/m/Y', timezone="Europe/Paris") }}{% endif %}" /> </div>
-        <div style="float:left;"><input type="text" size="2" name="timeEnd" id="timeEnd" value="{% if timeEnd is not empty %}{{ timeEnd|date('H:i', timezone="Europe/Paris") }}{% endif %}" /></div>
+        <div style="float:left;"><input type="text" size="2" name="timeEnd" id="timeEnd" value="{% if timeEnd is not empty %}{{ timeEnd }}{% endif %}" /></div>
         <div style="clear:both;padding: 0;"></div>
     </div>
     <div>

@@ -16,4 +16,24 @@ if (isset($_GET['id'])) {
 
 include_once("modules/front/ctrl/index.php");
 
+if (isset($_GET['page']))
+{
+    $func = $_GET['page'];
+    if ($_GET['page'] == "task")
+    {
+        $vars = $func($vars);
+    }
+    elseif ($_GET['page'] == "inbox")
+    {
+        $vars = $func($vars);
+    }
+    elseif ($_GET['page'] == "del" && isset($_GET['id']))
+    {
+        $func(); 
+    }
+    elseif ($_GET['page'] == "done" && isset($_GET['id']))
+    {
+        $func(); 
+    }
+}
 echo $view->render($vars);

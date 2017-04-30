@@ -4,6 +4,7 @@
         <link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
         <link rel="stylesheet" href="library/bootstrap/dist/css/bootstrap.css">
         <link rel="stylesheet" href="library/jquery-timepicker/jquery.timepicker.css">
+<link href="https://gitcdn.github.io/bootstrap-toggle/2.2.2/css/bootstrap-toggle.min.css" rel="stylesheet">
         <style>
             div {box-sizing:border-box; padding:10px;}
             .floated {float: left;}
@@ -23,11 +24,11 @@
                 border-left: 1px dotted #ddd;
             }
         </style>
-
         <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
         <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
         <!--<script type="text/javascript" src="daterangepicker/moment.min.js"></script>-->
         <script type="text/javascript" src="library/jquery-timepicker/jquery.timepicker.js"></script>
+        <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
     </head>
     <body>
         <div class="container">

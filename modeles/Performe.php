@@ -8,8 +8,8 @@ class Performe extends BDD
     protected $attributs = array(
         'id'            => 'id',
         'idcalendar'    => 'idcalendar',
-        'dateCreate'    => 'dateCreate',
-        'dateUpdate'    => 'dateUpdate'
+        'created'       => 'created',
+        'updated'       => 'updated'
     );
     protected $primary_key = 'id';
     protected $foreign_keys = array(
@@ -25,15 +25,6 @@ class Performe extends BDD
         }
         
         return $this->dateStart;
-    }
-    
-    public function save()
-    {
-        $this->dateUpdate = date('Y-m-d');
-        if (!isset($this->dateCreate)) {
-            $this->dateCreate = date('Y-m-d');
-        } 
-        parent::save();
     }
 
 }

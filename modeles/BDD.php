@@ -22,11 +22,8 @@ class BDD
         {
             foreach ($this->attributs as $key => $attribut)
             {
-                if ($key == 'id')
-                {
-                    if (isset($datas[$this->bdd_name . '_' . $key])) {
-                        $this->$key = $datas[$this->bdd_name . '_' . $key];
-                    }
+                if (isset($datas[$this->bdd_name . '_' . $key])) {
+                    $this->$key = $datas[$this->bdd_name . '_' . $key];
                 }
                 else
                 {
@@ -122,7 +119,7 @@ class BDD
             $query1 = 'UPDATE ' . $this->bdd_name . ' SET';
             foreach ($this->attributs as $key => $attribut)
             {
-                if ($key != 'id' || $this->getId() != null) {
+                if (($key != 'created' && $key != 'updated' && $key != 'id') || ($key == 'id' && $this->getId() != null)) {
                     $query1 .= ' ' . $key . ' = :' . $key . ',';
                 }
             }
@@ -132,7 +129,7 @@ class BDD
             $stmt  = $this->dbh->prepare($query);
             foreach ($this->attributs as $key => $attribut)
             {
-                if ($key != 'id' || $this->getId() != null) {
+                if (($key != 'created' && $key != 'updated' && $key != 'id') || ($key == 'id' && $this->getId() != null)) {
                     $stmt->bindValue(':' . $key, $this->{'get' . ucfirst($key)}());
                 }
             }
@@ -143,7 +140,7 @@ class BDD
             $query1 = 'INSERT INTO ' . $this->bdd_name . '(';
             foreach ($this->attributs as $key => $attribut)
             {
-                if ($key != 'id' || $this->getId() != null) {
+                if (($key != 'created' && $key != 'updated' && $key != 'id') || ($key == 'id' && $this->getId() != null)) {
                     $query1 .= $key . ", ";
                 }
             }
@@ -151,7 +148,7 @@ class BDD
             $query2 .= ") VALUES (";
             foreach ($this->attributs as $key => $attribut)
             {
-                if ($key != 'id' || $this->getId() != null) {
+                if (($key != 'created' && $key != 'updated' && $key != 'id') || ($key == 'id' && $this->getId() != null)) {
                     $query2 .= ':' . $key . ", ";
                 }
             }
@@ -161,7 +158,7 @@ class BDD
             $stmt  = $this->dbh->prepare($query);
             foreach ($this->attributs as $key => $attribut)
             {
-                if ($key != 'id' || $this->getId() != null) {
+                if (($key != 'created' && $key != 'updated' && $key != 'id') || ($key == 'id' && $this->getId() != null)) {
                     $stmt->bindValue(':' . $key, $this->{'get' . ucfirst($key)}());
                 }
             }
@@ -243,11 +240,7 @@ class BDD
             // Ajout des attributs de la class
             foreach ($this->attributs as $key => $attribut)
             {
-                if ($key != 'id') {
-                    $query1 .= ' ' . $key . ',';
-                } else {
-                    $query1 .= ' ' . $this->bdd_name . '.id as ' . $this->bdd_name . '_id,';
-                }
+                $query1 .= ' ' . $this->bdd_name . '.' . $key . ' as ' . $this->bdd_name . '_' . $key . ',';
             }
             
             // Ajout des attributs des classes enfants récursivement
@@ -286,7 +279,6 @@ class BDD
             if (!empty($orderby)) {
                 $query .= " order by " . $orderby;
             }
-var_dump($query);
             $stmt  = $this->dbh->query($query);
             if ($stmt) {
                 while($data = $stmt->fetch())
@@ -325,11 +317,7 @@ var_dump($query);
                 $foreign_obj = new $foreign_name();
                 foreach ($foreign_obj->attributs as $key => $attribut)
                 {
-                    if ($key != 'id') {
-                        $result .= ' ' . $key . ',';
-                    } else {
-                        $result .= ' ' . $foreign_obj->bdd_name . '.id as ' . $foreign_obj->bdd_name . '_id,';
-                    }
+                    $result .= ' ' . $foreign_obj->bdd_name . '.' . $key . ' as ' . $foreign_obj->bdd_name . '_' . $key . ',';
                 }
                 $result = $object->foreignKeysSelect($foreign_obj, $result, $object->bdd_name);
             }

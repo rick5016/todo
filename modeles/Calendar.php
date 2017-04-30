@@ -8,14 +8,15 @@ class Calendar extends BDD
     protected $attributs = array(
         'id'                    => 'id',
         'idtask'                => 'idtask',
-        'dateCreateCalendar'    => 'dateCreate',
         'dateStart'             => 'dateStart',
         'dateEnd'               => 'dateEnd',
         'reiterate'             => 'reiterate', // Tous les
         'interspace'            => 'interspace', // intervalle entre les itérations
         'reiterateEnd'          => 'reiterateEnd', // Jusqu'à (toujours/custom)
         'untilDate'             => 'untilDate', // Jusqu'à une date
-        'untilNumber'           => 'untilNumber' // Jusqu'à un nombre de fois
+        'untilNumber'           => 'untilNumber', // Jusqu'à un nombre de fois
+        'created'               => 'created',
+        'updated'               => 'updated'
     );
     protected $primary_key = 'id';
     protected $foreign_keys = array(
@@ -30,9 +31,9 @@ class Calendar extends BDD
             $arrayDateTime   = explode(' ', $dateStart); // Time
             $arrayDate       = explode('/', $arrayDateTime[0]);
             if (isset($arrayDateTime[1])) {
-                $this->dateStart = $arrayDate[2] . '-' . $arrayDate[0] . '-' . $arrayDate[1] . ' ' . $arrayDateTime[1];
+                $this->dateStart = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . ' ' . $arrayDateTime[1];
             } else {
-                $this->dateStart = $arrayDate[2] . '-' . $arrayDate[0] . '-' . $arrayDate[1] . " 00:00:00";
+                $this->dateStart = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . " 00:00:00";
             }
         }
         else {
@@ -47,9 +48,9 @@ class Calendar extends BDD
             $arrayDateTime   = explode(' ', $dateEnd); // Time
             $arrayDate       = explode('/', $arrayDateTime[0]);
             if (isset($arrayDateTime[1])) {
-                $this->dateEnd = $arrayDate[2] . '-' . $arrayDate[0] . '-' . $arrayDate[1] . ' ' . $arrayDateTime[1];
+                $this->dateEnd = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . ' ' . $arrayDateTime[1];
             } else {
-                $this->dateEnd = $arrayDate[2] . '-' . $arrayDate[0] . '-' . $arrayDate[1] . " 00:00:00";
+                $this->dateEnd = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . " 00:00:00";
             }
         }
         else {
@@ -98,7 +99,25 @@ class Calendar extends BDD
         try {
             if ($this->dbh->beginTransaction())
             {
-                $this->setDateStart(date('Y-m-d'));
+                $interval = $this->interspace;
+                $dateTimeStart = new DateTime($this->dateEnd);
+                $dateTimeStart->add(new DateInterval('P1D'));
+                $this->setDateStart($dateTimeStart->format('Y-m-d'));
+                $dateTime = new DateTime($this->dateEnd);
+                if ($this->reiterate == 1) {
+                    $dateTime->add(new DateInterval('P' . $interval . 'D'));
+                } elseif ($this->reiterate == 2)
+                {
+                    $interval *= 7;
+                    $dateTime->add(new DateInterval('P' . $interval . 'D'));
+                } 
+                elseif ($this->reiterate == 3) {
+                    $dateTime->add(new DateInterval('P' . $interval . 'M'));
+                } elseif ($this->reiterate == 4) {
+                    $dateTime->add(new DateInterval('P' . $interval . 'Y'));
+                }
+                // Date de fin doit valoir date debut + interspace . iterate
+                $this->setDateEnd($dateTime->format('Y-m-d'));
                 parent::save();
                 
                 $performe = new Performe(array('idcalendar' => $_GET['id']));

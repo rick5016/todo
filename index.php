@@ -1,4 +1,5 @@
 <?php
+session_start();
 include_once 'modeles/Task.php';
 include_once 'modeles/Calendar.php';
 include_once 'modeles/Performe.php';
