@@ -64,7 +64,7 @@
 
     {% set calendar = task.calendars.0 %}
     {% set dateStart = calendar.dateAffichage|date('Y-m-d', timezone="Europe/Paris") %}
-
+    
     <!-- Gere la ligne entre les tâches anterieures à la date du jour et les autres -->
     {% if dateStart > "now"|date('Y-m-d', timezone="Europe/Paris") and displayHr %}
         <hr />
@@ -86,26 +86,26 @@
     {% endif %}
 
     <ul>
-        {% if task.priority == 0 %}<span title="Aucune Priorité" class="glyphicon glyphicon-asterisk" style="color:#fff;"></span>
-        {% elseif task.priority == 1 %}<span title="Priorité 1" class="glyphicon glyphicon-asterisk" style="color:#d9534f;"></span>
-        {% elseif task.priority == 2 %}<span title="Priorité 2" class="glyphicon glyphicon-asterisk" style="color:#f0ad4e;"></span>
-        {% elseif task.priority == 3 %}<span title="Priorité 3" class="glyphicon glyphicon-asterisk" style="color:#337ab7;"></span>
-        {% elseif task.priority == 4 %}<span title="Priorité 4" class="glyphicon glyphicon-asterisk" style="color:#5bc0de;"></span>
-        {% endif %}
         Créé le : {{ calendar.created|date('d/m', timezone="Europe/Paris") }} - Du {{ calendar.dateStart|date('d/m/Y', timezone="Europe/Paris") }} au - {{ calendar.dateEnd|date('d/m/Y', timezone="Europe/Paris") }}
         {% if calendar.reiterate == 0 %}Unique{% elseif calendar.reiterate == 1 %}Tous les {{ calendar.interspace }} jour(s){% elseif calendar.reiterate == 2 %}Toutes les {{ calendar.interspace }} semaine(s){% elseif calendar.reiterate == 3 %}Tous les {{ calendar.interspace }} mois{% elseif calendar.reiterate == 4 %}Toutes les {{ calendar.interspace }} année(s){% elseif calendar.reiterate == 5 %}Custom{% endif %}
         <br />
         <li style="list-style-type:none;">
-            {% if calendar.done == false %}
-                {% if displayHr %}
-                    <a href="index.php?page=done&id={{ calendar.id }}"><span title="à faire" class="glyphicon glyphicon-unchecked" style="color:red"></span></a> 
+            {% if displayHr %}
+            <a href="index.php?page=done&id={{ calendar.id }}">
+                {% if task.priority == 0 %}<span title="Aucune Priorité" class="glyphicon glyphicon-ok-circle" style="color:#c0c0c0;font-size: 35;vertical-align:middle;"></span>
+                {% elseif task.priority == 1 %}<span title="Priorité 1" class="glyphicon glyphicon-ok-circle" style="color:#d9534f;font-size: 35;vertical-align:middle;"></span>
+                {% elseif task.priority == 2 %}<span title="Priorité 2" class="glyphicon glyphicon-ok-circle" style="color:#f0ad4e;font-size: 35;vertical-align:middle;"></span>
+                {% elseif task.priority == 3 %}<span title="Priorité 3" class="glyphicon glyphicon-ok-circle" style="color:#337ab7;font-size: 35;vertical-align:middle;"></span>
+                {% elseif task.priority == 4 %}<span title="Priorité 4" class="glyphicon glyphicon-ok-circle" style="color:#5bc0de;font-size: 35;vertical-align:middle;"></span>
                 {% endif %}
+                <b>{{ task.name }}</b> <a href="index.php?page=task&id={{ task.id }}"><span title="modifier" class="glyphicon glyphicon-edit"></span></a> <a title="supprimer" href="index.php?page=del&id={{ task.id }}"><span class="glyphicon glyphicon-remove"></span></a>
+            </a> 
             {% else %}
-                <span title="fait" class="glyphicon glyphicon-check" style="color:green"></span> 
+                <b>{{ task.name }}</b> <a href="index.php?page=task&id={{ task.id }}"><span title="modifier" class="glyphicon glyphicon-edit"></span></a> <a title="supprimer" href="index.php?page=del&id={{ task.id }}"><span class="glyphicon glyphicon-remove"></span></a>
             {% endif %}
-            <b>{{ task.name }}</b> <a href="index.php?page=task&id={{ task.id }}"><span title="modifier" class="glyphicon glyphicon-edit"></span></a> <a title="supprimer" href="index.php?page=del&id={{ task.id }}"><span class="glyphicon glyphicon-remove"></span></a>
         </li>
         <br /><br />
     </ul>
+        
     
 {% endfor %}

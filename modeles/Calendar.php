@@ -100,10 +100,20 @@ class Calendar extends BDD
             if ($this->dbh->beginTransaction())
             {
                 $interval = $this->interspace;
+                
+                // Si la date de fin de l'événement est avant la date d'aujourd'hui alors on calcul la date de fin après aujourdh'ui
+                if ($this->dateEnd < date('Y-m-d H:i:s'))
+                {
+                    $this->dateEnd = $this->setDateNext($this->dateEnd, $this->reiterate, $interval);
+                }
+                
+                // La date de début du prochain événement est la date le lendemain de la date de fin
                 $dateTimeStart = new DateTime($this->dateEnd);
                 $dateTimeStart->add(new DateInterval('P1D'));
                 $this->setDateStart($dateTimeStart->format('Y-m-d'));
-                $dateTime = new DateTime($this->dateEnd);
+                
+                // Calcul de la nouvelle date de fin
+                $dateTime = new DateTime($this->dateStart);
                 if ($this->reiterate == 1) {
                     $dateTime->add(new DateInterval('P' . $interval . 'D'));
                 } elseif ($this->reiterate == 2)
@@ -111,12 +121,14 @@ class Calendar extends BDD
                     $interval *= 7;
                     $dateTime->add(new DateInterval('P' . $interval . 'D'));
                 } 
-                elseif ($this->reiterate == 3) {
-                    $dateTime->add(new DateInterval('P' . $interval . 'M'));
+                elseif ($this->reiterate == 3)
+                {
+                    // TODO : boucler sur interval
+                    $dateTime->modify('last day of this month');
                 } elseif ($this->reiterate == 4) {
+                    // TODO : faire comme pour les mois
                     $dateTime->add(new DateInterval('P' . $interval . 'Y'));
                 }
-                // Date de fin doit valoir date debut + interspace . iterate
                 $this->setDateEnd($dateTime->format('Y-m-d'));
                 parent::save();
                 
@@ -130,6 +142,36 @@ class Calendar extends BDD
             var_dump($e->getMessage().' At line '.$e->getLine());
             exit;
         }
+    }
+    
+    function setDateNext($date, $reiterate, $interval)
+    {
+        $today = date('Y-m-d');
+        if ($date <= $today)
+        {
+            while ($date <= $today)
+            {
+                $dateTime = new DateTime($date);
+                if ($reiterate == 1) {
+                    $dateTime->add(new DateInterval('P' . $interval . 'D'));
+                } elseif ($reiterate == 2)
+                {
+                    $interval *= 7;
+                    $dateTime->add(new DateInterval('P' . $interval . 'D'));
+                } 
+                elseif ($reiterate == 3)
+                {
+                    // TODO : boucler sur interval
+                    $dateTime->modify('last day of next month');
+                }
+                elseif ($reiterate == 4) {
+                    // TODO : faire comme pour les mois
+                    $dateTime->add(new DateInterval('P' . $interval . 'Y'));
+                }
+                $date = $dateTime->format('Y-m-d');
+            }
+        }
+        return $date;
     }
 
 }

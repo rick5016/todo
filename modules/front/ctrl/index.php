@@ -114,12 +114,10 @@ function inbox($vars)
     foreach ($tasks as $task)
     {
         $afficher_la_tache = true;
-        $calendar = $task->calendars[0];
-        $calendar->done = false;
-        $date = new DateTime($calendar->dateStart);
-        $calendar->dateStart = $date->format('Y-m-d');
-        $performes = $calendar->getPerformes();
         
+        $calendar               = $task->calendars[0];
+
+        // Afficher ou non les dates après Aujourd'hui
         if (!isset($vars['ant']) && $calendar->dateStart > date('Y-m-d')) {
             $afficher_la_tache = false;
         }
@@ -127,14 +125,19 @@ function inbox($vars)
         if ($afficher_la_tache)
         {
             $date_affichage = $calendar->dateStart;
-            if ($date_affichage < date('Y-m-d') && $calendar->dateEnd >  date('Y-m-d')) {
-                $date_affichage = date('Y-m-d');
+            
+            // Si la date d'aujoud'hui ce situe entre le début et la fin de l'événement alors la date d'affiche est la date d'aujourd'hui
+            // Si la date de fin est passé et que retierate <> de 0 alors la date d'affiche est la date d'aujourd'hui
+            if (($date_affichage < date('Y-m-d') && $calendar->dateEnd >  date('Y-m-d')) || ($calendar->dateEnd <  date('Y-m-d') && $calendar->reiterate != 0)) {
+                $date_affichage = date('Y-m-d') . ' 00:00:00';
             }
-            $dateTimeAffichage = new DateTime($date_affichage);
-            $calendar->dateAffichage = $dateTimeAffichage->format('Y-m-d');
+            $calendar->dateAffichage = $date_affichage;
+            
+            // Afficher ou non les dates avant aujourd'hui
             if (!isset($vars['past']) && ($calendar->dateAffichage < date('Y-m-d'))) {
                 $afficher_la_tache = false;
             }
+            
             if ($afficher_la_tache) {
                 $returns[$date_affichage . '-' . $task->priority . '-' . $calendar->id][] = $task;
             }
