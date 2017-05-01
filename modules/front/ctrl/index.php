@@ -166,7 +166,7 @@ function done()
 {
     $calendar = BDD::factory('calendar')->loadOne(false, array('id' => $_GET['id']));
     if (isset($calendar)) {
-        $calendar->updatePerforme();
+        $calendar->performe();
     } 
 }
 

@@ -8,7 +8,7 @@
         <style>
             div {box-sizing:border-box; padding:10px;}
             .floated {float: left;}
-            .container {width: 100%; position:relative}
+            .box {width: 100%; position:relative}
             .menu, .content {
                 width:60%; 
                 box-sizing:border-box; 
@@ -17,6 +17,9 @@
             .menu {width:20%; }
             .clearfix {clear:both;}
             .sep {
+                background-color:black;
+                padding:0;
+                border-width: 10px;
                 position: absolute;
                 left:20%;
                 top:0;
@@ -30,8 +33,8 @@
         <script src="https://gitcdn.github.io/bootstrap-toggle/2.2.2/js/bootstrap-toggle.min.js"></script>
     </head>
     <body>
-        <div class="container">
-            <div class="floated menu">
+        <div class="box" style="padding:0;margin:0;">
+            <div class="floated menu" style="height:100%;background-color:#F5F5F5">
                 <div style="border: 1px black dotted;text-align:center;margin-right:20px;margin-bottom: 20px;">{{ "now"|date('d/m/Y H:i', timezone="Europe/Paris") }}</div>
                 <ul style="list-style-type:none;">
                     <li><a href="index.php?page=task"><span title="ajouter" class="glyphicon glyphicon-plus"></span> Ajouter une tâche</a></li>

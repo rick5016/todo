@@ -17,17 +17,13 @@ class Task extends BDD
         'calendars' => array('calendar','id','idtask')
     );
     
-    public $calendar = array();
-    
-    function __clone()
+    function getCalendars()
     {
-        $obj            = new Task();
-        $obj->id        = $this->id;
-        $obj->name      = $this->name;
-        $obj->priority  = $this->priority;
-        $obj->calendars = $this->calendars;
-
-        return $obj;
+        if (isset($this->calendars)) {
+            return $this->calendars;
+        }
+        
+        return null;
     }
 
     public function save()
@@ -36,7 +32,7 @@ class Task extends BDD
             if ($this->dbh->beginTransaction())
             {
                 parent::save();
-                foreach ($this->calandar as $calendar)
+                foreach ($this->calandars as $calendar)
                 {
                     $calendar->setIdtask((int) $this->getId());
                     $calendar->save();

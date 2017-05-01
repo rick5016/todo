@@ -80,11 +80,6 @@ class Calendar extends BDD
         return $this->dateEnd;
     }
     
-    /**
-     * Pour twig
-     * 
-     * @return type
-     */
     function getPerformes()
     {
         if (isset($this->performes)) {
@@ -94,7 +89,7 @@ class Calendar extends BDD
         return null;
     }
     
-    function updatePerforme()
+    function performe()
     {
         try {
             if ($this->dbh->beginTransaction())
@@ -102,15 +97,14 @@ class Calendar extends BDD
                 $interval = $this->interspace;
                 
                 // Si la date de fin de l'événement est avant la date d'aujourd'hui alors on calcul la date de fin après aujourdh'ui
-                if ($this->dateEnd < date('Y-m-d H:i:s'))
-                {
-                    $this->dateEnd = $this->setDateNext($this->dateEnd, $this->reiterate, $interval);
+                if ($this->dateEnd < date('Y-m-d H:i:s')) {
+                    $this->dateEnd = $this->getNextDateEnd($this->dateEnd, $this->reiterate, $interval);
                 }
                 
                 // La date de début du prochain événement est la date le lendemain de la date de fin
-                $dateTimeStart = new DateTime($this->dateEnd);
-                $dateTimeStart->add(new DateInterval('P1D'));
-                $this->setDateStart($dateTimeStart->format('Y-m-d'));
+                $dateTimeStart = new DateTime($this->dateStart);
+                $dateTimeEnd = new DateTime($this->dateEnd);
+                $dateTimeEnd->add(new DateInterval('P1D'));
                 
                 // Calcul de la nouvelle date de fin
                 $dateTime = new DateTime($this->dateStart);
@@ -123,13 +117,18 @@ class Calendar extends BDD
                 } 
                 elseif ($this->reiterate == 3)
                 {
-                    // TODO : boucler sur interval
-                    $dateTime->modify('last day of this month');
-                } elseif ($this->reiterate == 4) {
-                    // TODO : faire comme pour les mois
-                    $dateTime->add(new DateInterval('P' . $interval . 'Y'));
+                    for ($i = 0;$i<$interval;$i++) {
+                        $dateTime->modify('last day of next month');
+                    }
                 }
-                $this->setDateEnd($dateTime->format('Y-m-d'));
+                elseif ($this->reiterate == 4)
+                {
+                    for ($i = 0;$i<$interval;$i++) {
+                        $dateTime->modify('last day of next year');
+                    }
+                }
+                $this->setDateStart($dateTimeEnd->format('Y-m-d') . ' ' . $dateTimeStart->format('H:i')); // On récup-re l'heure de la date de début
+                $this->setDateEnd($dateTime->format('Y-m-d') . ' ' . $dateTimeEnd->format('H:i'));
                 parent::save();
                 
                 $performe = new Performe(array('idcalendar' => $_GET['id']));
@@ -137,14 +136,16 @@ class Calendar extends BDD
                 
                 $this->dbh->commit();
             }
-        } catch (PDOException $e) {
+        }
+        catch (PDOException $e)
+        {
             $this->dbh->rollBack();
             var_dump($e->getMessage().' At line '.$e->getLine());
             exit;
         }
     }
     
-    function setDateNext($date, $reiterate, $interval)
+    function getNextDateEnd($date, $reiterate, $interval)
     {
         $today = date('Y-m-d');
         if ($date <= $today)
@@ -161,12 +162,15 @@ class Calendar extends BDD
                 } 
                 elseif ($reiterate == 3)
                 {
-                    // TODO : boucler sur interval
-                    $dateTime->modify('last day of next month');
+                    for ($i = 0;$i<$interval;$i++) {
+                        $dateTime->modify('last day of next month');
+                    }
                 }
-                elseif ($reiterate == 4) {
-                    // TODO : faire comme pour les mois
-                    $dateTime->add(new DateInterval('P' . $interval . 'Y'));
+                elseif ($reiterate == 4)
+                {
+                    for ($i = 0;$i<$interval;$i++) {
+                        $dateTime->modify('last day of next year');
+                    }
                 }
                 $date = $dateTime->format('Y-m-d');
             }
