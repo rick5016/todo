@@ -128,13 +128,13 @@ function inbox($vars)
             
             // Si la date d'aujoud'hui ce situe entre le début et la fin de l'événement alors la date d'affiche est la date d'aujourd'hui
             // Si la date de fin est passé et que retierate <> de 0 alors la date d'affiche est la date d'aujourd'hui
-            if (($date_affichage < date('Y-m-d') && $calendar->dateEnd >  date('Y-m-d')) || ($calendar->dateEnd <  date('Y-m-d') && $calendar->reiterate != 0)) {
-                $date_affichage = date('Y-m-d') . ' 00:00:00';
+            if (($date_affichage < date('Y-m-d H:i') && $calendar->dateEnd >  date('Y-m-d H:i')) || ($calendar->dateEnd <  date('Y-m-d H:i') && $calendar->reiterate != 0)) {
+                $date_affichage = date('Y-m-d H:i');
             }
             $calendar->dateAffichage = $date_affichage;
             
             // Afficher ou non les dates avant aujourd'hui
-            if (!isset($vars['past']) && ($calendar->dateAffichage < date('Y-m-d'))) {
+            if (!isset($vars['past']) && ($calendar->dateAffichage < date('Y-m-d H:i'))) {
                 $afficher_la_tache = false;
             }
             
