@@ -39,5 +39,10 @@ if (isset($_GET['page']))
     {
         $func(); 
     }
+    elseif ($_GET['page'] == "cancel" && isset($_GET['id']) && isset($_GET['idPerforme']))
+    {
+        $func(); 
+    }
 }
+$vars['projects']     = Project::factory('project')->load(false);
 echo $view->render($vars);

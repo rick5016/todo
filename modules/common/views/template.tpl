@@ -41,9 +41,14 @@
                     <li><a href="index.php?page=inbox"><span title="boîte de réception" class="glyphicon glyphicon-inbox"></span> Boîte de réception</a></li>
                     <li><a href="index.php?page=inbox&filtre=today"><span title="boîte de réception" class="glyphicon glyphicon-calendar"></span> Aujourd'hui</a></li>
                 </ul>
-                Project / Labels / Filtres <br />
-
-                - project 1
+                <div style="text-align:center"><span><a href="">Projets</a> / <a href="">Labels</a> / <a href="">Filtres</a></span></div>
+                <div id="links_project">
+                    <ul>
+                    {% for project in projects %}
+                        <li><a href="?filtre=project&id={{ project.id }}">{{ project.name }}</a></li>
+                    {% endfor %}
+                    </ul>
+                </div>
             </div>
             <div class="sep"></div>
             <div class="floated content">
@@ -52,6 +57,8 @@
                 {% elseif page == 'del' and id != null %}
                     <script>window.location="index.php?page=inbox";</script>
                 {% elseif page == 'done' and id != null %}
+                    <script>window.location="index.php?page=inbox";</script>
+                {% elseif page == 'cancel' %}
                     <script>window.location="index.php?page=inbox";</script>
                 {% elseif page == 'inbox' %}
                     {% include('/front/views/inbox.tpl') %}

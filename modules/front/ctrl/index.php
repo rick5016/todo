@@ -4,80 +4,80 @@ function task($vars)
 {
     if (isset($_GET['id']))
     {
-        $id                     = array('id' => $_GET['id']);
         $task                   = Task::factory('task')->loadOne(true, array('task.id' => $_GET['id']));
-        $name                   = $task->name;
+        $project_id             = $task->idProject;
+        $task_name              = $task->name;
         $priority               = $task->priority;
-        $calendar               = $task->calendars[0];
-        $dateStart_dateTime     = new DateTime($calendar->dateStart);
-        $dateEnd_dateTime       = new DateTime($calendar->dateEnd);
+        $dateStart_dateTime     = new DateTime($task->dateStart);
+        $dateEnd_dateTime       = new DateTime($task->dateEnd);
         $dateStart              = $dateStart_dateTime->format('d/m/Y');
         $dateEnd                = $dateEnd_dateTime->format('d/m/Y');
         $timeStart              = $dateStart_dateTime->format('H:i');
         $timeEnd                = $dateEnd_dateTime->format('H:i');
-        $repeat                 = $calendar->reiterate;
-        $interspace             = $calendar->interspace;
-        $reiterateEnd           = $calendar->reiterateEnd;
-        if (isset($calendar->untilDate)) {
-            $untilDate              = $calendar->untilDate;
+        $repeat                 = $task->reiterate;
+        $interspace             = $task->interspace;
+        $reiterateEnd           = $task->reiterateEnd;
+        if (isset($task->untilDate)) {
+            $untilDate              = $task->untilDate;
         }
-        $untilNumber            = $calendar->untilNumber;
+        $untilNumber            = $task->untilNumber;
     }
-
-    if (isset($_POST['submit']))
+    $params = $_POST;
+    if (isset($params['submit']))
     {
-        if (!isset($_POST['name']) || empty($_POST['name'])) {
+        if (!isset($params['task_name']) || empty($params['task_name'])) {
             echo '<span style="color:red">Le nom est obligatoire <br /></span>';
         } else {
             // Obligatoire
-            $name           = $_POST['name'];
-            $priority       = isset($_POST['priority']) ? $_POST['priority'] : 0;
-            $dateStartSave  = $dateStart = BDD::dateFormat($_POST['dateStart']);
-            $dateEndSave    = $dateEnd = BDD::dateFormat($_POST['dateEnd']);
-            $timeStart      = $_POST['timeStart'];
-            $timeEnd        = $_POST['timeEnd'];
-            $repeat         = $_POST['repeat'];
-            $interspace     = $_POST['interspace'];
-            $reiterateEnd   = $_POST['reiterateEnd'];
-            if (!empty($_POST['untilDate'])) {
-                $untilDate      = $_POST['untilDate'];
+            $project_id     = $params['project_id'];
+            $task_name      = $params['task_name'];
+            $priority       = isset($params['priority']) ? $params['priority'] : 0;
+            $dateStartSave  = $dateStart = BDD::dateFormat($params['dateStart']);
+            $dateEndSave    = $dateEnd = BDD::dateFormat($params['dateEnd']);
+            $timeStart      = $params['timeStart'];
+            $timeEnd        = $params['timeEnd'];
+            $repeat         = $params['repeat'];
+            $interspace     = $params['interspace'];
+            $reiterateEnd   = $params['reiterateEnd'];
+            if (!empty($params['untilDate'])) {
+                $untilDate      = $params['untilDate'];
             }
-            $untilNumber    = $_POST['untilNumber'];
+            $untilNumber    = $params['untilNumber'];
 
-            if (!isset($task) && !isset($calendar))
-            {
-                $calendar = new Calendar();
+            if (!isset($task)) {
                 $task = new Task();
             }
 
-            if (isset($_POST['timeStart']) && !empty($_POST['timeStart'])) {
-                $dateStartSave .= ' ' . $_POST['timeStart'] . ':00';
+            if (isset($params['timeStart']) && !empty($params['timeStart'])) {
+                $dateStartSave .= ' ' . $params['timeStart'] . ':00';
             } else {
                 $dateStartSave .= ' 00:00:00';
             }
-            if (isset($_POST['timeEnd']) && !empty($_POST['timeEnd'])) {
-                $dateEndSave .= ' ' . $_POST['timeEnd'] . ':00';
+            if (isset($params['timeEnd']) && !empty($params['timeEnd'])) {
+                $dateEndSave .= ' ' . $params['timeEnd'] . ':00';
             } else {
                 $dateStartSave .= ' 00:00:00';
             }
 
-            $calendar->setDateStart($dateStartSave);
-            $calendar->setDateEnd($dateEndSave);
-            $calendar->reiterate    = $repeat;
-            $calendar->interspace   = $interspace;
-            $calendar->reiterateEnd = $reiterateEnd;
+            $task->setDateStart($dateStartSave);
+            $task->setDateEnd($dateEndSave);
+            $task->reiterate    = $repeat;
+            $task->interspace   = $interspace;
+            $task->reiterateEnd = $reiterateEnd;
             if (isset($untilDate)) {
-                $calendar->untilDate    = $untilDate;
+                $task->untilDate    = $untilDate;
             }
-            $calendar->untilNumber  = $untilNumber;
-            $task->name             = $name;
-            $task->priority         = $priority;
-            $task->calandar         = array($calendar);
+            $task->untilNumber  = $untilNumber;
+            $task->name    = $task_name;
+            $task->priority     = $priority;
+            $task->idProject    = $project_id;
             $task->save();
         }
     }
-    $vars['calendar']     = (isset($calendar)) ? true : null;
-    $vars['name']         = (isset($name)) ? $name : '';
+    $vars['projects']     = Project::factory('project')->load(false);
+    $vars['project_id']         = (isset($project_id)) ? true : null;
+    $vars['task']         = (isset($task)) ? true : null;
+    $vars['task_name']    = (isset($task_name)) ? $task_name : '';
     $vars['priority']     = (isset($priority)) ? $priority : '';
     $vars['dateStart']    = (isset($dateStart)) ? $dateStart : '';
     $vars['dateEnd']      = (isset($dateEnd)) ? $dateEnd : '';
@@ -103,7 +103,7 @@ function inbox($vars)
         $vars = $filtres->check($_POST, $vars);
     }
 
-    $returns = array();
+    $tri = array();
     $where = array();
     $vars['priority'] = '11111';
     if (isset($_GET['priority'])) {
@@ -114,38 +114,36 @@ function inbox($vars)
     foreach ($tasks as $task)
     {
         $afficher_la_tache = true;
-        
-        $calendar               = $task->calendars[0];
 
         // Afficher ou non les dates après Aujourd'hui
-        if (!isset($vars['ant']) && $calendar->dateStart > date('Y-m-d')) {
+        if (!isset($vars['ant']) && $task->dateStart > date('Y-m-d')) {
             $afficher_la_tache = false;
         }
         
         if ($afficher_la_tache)
         {
-            $date_affichage = $calendar->dateStart;
+            $date_affichage = $task->dateStart;
             
             // Si la date d'aujoud'hui ce situe entre le début et la fin de l'événement alors la date d'affiche est la date d'aujourd'hui
             // Si la date de fin est passé et que retierate <> de 0 alors la date d'affiche est la date d'aujourd'hui
-            if (($date_affichage < date('Y-m-d H:i') && $calendar->dateEnd >  date('Y-m-d H:i')) || ($calendar->dateEnd <  date('Y-m-d H:i') && $calendar->reiterate != 0)) {
-                $date_affichage = date('Y-m-d H:i');
+            if (($date_affichage < date('Y-m-d H:i') && $task->dateEnd >  date('Y-m-d H:i')) || ($task->dateEnd <  date('Y-m-d H:i') && $task->reiterate != 0)) {
+                $date_affichage = date('Y-m-d H:i') . ':00';
             }
-            $calendar->dateAffichage = $date_affichage;
+            $task->dateAffichage = $date_affichage;
             
             // Afficher ou non les dates avant aujourd'hui
-            if (!isset($vars['past']) && ($calendar->dateAffichage < date('Y-m-d H:i'))) {
+            if (!isset($vars['past']) && ($task->dateAffichage < date('Y-m-d H:i'))) {
                 $afficher_la_tache = false;
             }
             
             if ($afficher_la_tache) {
-                $returns[$date_affichage . '-' . $task->priority . '-' . $calendar->id][] = $task;
+                $tri[$date_affichage . '-' . $task->priority . '-' . $task->id][] = $task;
             }
         }
     }
-    ksort($returns);
+    ksort($tri);
     $return = array();
-    foreach ($returns as $datas)
+    foreach ($tri as $datas)
     {
         foreach ($datas as $data) {
             $return[] = $data;
@@ -164,60 +162,13 @@ function del()
 
 function done()
 {
-    $calendar = BDD::factory('calendar')->loadOne(false, array('id' => $_GET['id']));
-    if (isset($calendar)) {
-        $calendar->performe();
+    $task = BDD::factory('task')->loadOne(false, array('id' => $_GET['id']));
+    if (isset($task)) {
+        $task->performe();
     } 
 }
 
-function setDateNext($date, $type, $interval)
+function cancel()
 {
-    $today = date('Y-m-d');
-    if ($date <= $today)
-    {
-        while ($date <= $today)
-        {
-            $dateTime = new DateTime($date);
-            if ($type == 'day') {
-                $dateTime->add(new DateInterval('P' . $interval . 'D'));
-            } elseif ($type == 'week')
-            {
-                $interval *= 7;
-                $dateTime->add(new DateInterval('P' . $interval . 'D'));
-            } 
-            elseif ($type == 'month') {
-                $dateTime->add(new DateInterval('P' . $interval . 'M'));
-            } elseif ($type == 'year') {
-                $dateTime->add(new DateInterval('P' . $interval . 'Y'));
-            }
-            $date = $dateTime->format('Y-m-d');
-        }
-    }
-    return $date;
-}
-function setDatePrev($date, $type, $interval)
-{
-    $today = date('Y-m-d');
-    if ($date < $today)
-    {
-        while ($date < $today)
-        {
-            $dateprev = $date;
-            $dateTime = new DateTime($date);
-            if ($type == 'day') {
-                $dateTime->add(new DateInterval('P' . $interval . 'D'));
-            } elseif ($type == 'week')
-            {
-                $interval *= 7;
-                $dateTime->add(new DateInterval('P' . $interval . 'D'));
-            }
-            elseif ($type == 'month') {
-                $dateTime->add(new DateInterval('P' . $interval . 'M'));
-            } elseif ($type == 'year') {
-                $dateTime->add(new DateInterval('P' . $interval . 'Y'));
-            }
-            $date = $dateTime->format('Y-m-d');
-        }
-    }
-    return isset($dateprev) ? $dateprev : $date;
+    BDD::factory('task')->deleteLastPerforme($_GET['id'], $_GET['idPerforme']); 
 }

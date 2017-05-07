@@ -8,8 +8,8 @@ class BDD
     private $password = '';
 
     /**
-     * Attention ramène TOUS les enfants
-     * TODO : Utiliser la limite en paramètre (l'ordre est determiné dans $datas)
+     * Attention ramÃ¨ne TOUS les enfants
+     * TODO : Utiliser la limite en paramÃ¨tre (l'ordre est determinÃ© dans $datas)
      * 
      * @param type $datas
      * @param type $foreign_keys
@@ -33,15 +33,15 @@ class BDD
                 }
             }
             
-            // Chargement des objets enfants à l'aide des clés étrangères présentent dans l'objet d'ORM
+            // Chargement des objets enfants Ã  l'aide des clÃ©s Ã©trangÃ¨res prÃ©sentent dans l'objet d'ORM
             if ($foreign_keys && (get_class($this) != $className))
             {
                 // exemple : 'calendars' => array('calendar','id','idTask')
                 foreach ($this->foreign_keys as $foreign_name => $foreign_datas)
                 {
-                    // Ne charge pas la class parente (permet d'éviter les boucles infinies
+                    // Ne charge pas la class parente (permet d'Ã©viter les boucles infinies
                     // Charge l'objet enfant uniquement si l'id de cette enfant existe dans le tableau $datas
-                    // TODO : si c'est le Nième ($limit) object de la même classe on arrête
+                    // TODO : si c'est le NiÃ¨me ($limit) object de la mÃªme classe on arrÃªte
                     if (strtolower($className) != $foreign_datas[0] && isset($datas[$foreign_datas[0] . '_id']))
                     {
                         $foreign_obj = array();
@@ -63,7 +63,7 @@ class BDD
                 $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $this->dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             } catch (PDOException $e) {
-                    echo 'Connexion échouée : ' . $e->getMessage();
+                    echo 'Connexion Ã©chouÃ©e : ' . $e->getMessage();
             }
         }
     }
@@ -108,7 +108,7 @@ class BDD
     
     /**
      * INSERT OR UPDATE
-     * l'enregistrement des enfants (et les transactions) doivent être géré dans les classe d'ORM respective
+     * l'enregistrement des enfants (et les transactions) doivent Ãªtre gÃ©rÃ© dans les classe d'ORM respective
      * 
      * @return \BDD $this
      */
@@ -162,6 +162,8 @@ class BDD
                     $stmt->bindValue(':' . $key, $this->{'get' . ucfirst($key)}());
                 }
             }
+//            "INSERT INTO task(idProject, name, priority, dateStart, dateEnd, reiterate, interspace, reiterateEnd, untilDate, untilNumber) "
+//            . "VALUES (:idProject, :name, :priority, :dateStart, :dateEnd, :reiterate, :interspace, :reiterateEnd, :untilDate, :untilNumber)"
             $this->execute($stmt);
             if ($this->getId() == null) {
                 $this->setId($this->dbh->lastInsertId());
@@ -173,7 +175,7 @@ class BDD
     
     /**
      * DELETE
-     * TODO : gérer les suppressions des enfants récursivement (comme le load)
+     * TODO : gÃ©rer les suppressions des enfants rÃ©cursivement (comme le load)
      * 
      * @param booleen $foreing_keys
      * @param int $id
@@ -223,12 +225,12 @@ class BDD
     }
     
     /**
-     * Récupère un résulat sous forme de tableau d'objet avec ou sans enfants, peux prendre en paramètre des clauses where sous forme de tableau ainsi qu'un order by sous forme de string
+     * RÃ©cupÃ¨re un rÃ©sulat sous forme de tableau d'objet avec ou sans enfants, peux prendre en paramÃ¨tre des clauses where sous forme de tableau ainsi qu'un order by sous forme de string
      * 
-     * @param booleen $foreing_keys Récupère ou non les objets enfants renseignés dans l'attribut foreing_keys sous forme de tableau d'objet
-     * @param array $where Clause where sous forme de tableau clé = valeur
+     * @param booleen $foreing_keys RÃ©cupÃ¨re ou non les objets enfants renseignÃ©s dans l'attribut foreing_keys sous forme de tableau d'objet
+     * @param array $where Clause where sous forme de tableau clÃ© = valeur
      * @param string $orderby Order by sous forme de string
-     * @return array(array(object BDD)) $result Résultat sous forme de teableau d'objet
+     * @return array(array(object BDD)) $result RÃ©sultat sous forme de teableau d'objet
      */
     function load($foreing_keys = false, $where = array(), $orderby = '')
     {
@@ -243,7 +245,7 @@ class BDD
                 $query1 .= ' ' . $this->bdd_name . '.' . $key . ' as ' . $this->bdd_name . '_' . $key . ',';
             }
             
-            // Ajout des attributs des classes enfants récursivement
+            // Ajout des attributs des classes enfants rÃ©cursivement
             if ($foreing_keys) {
                 $query1 = $this->foreignKeysSelect($this, $query1);
             }
@@ -295,7 +297,7 @@ class BDD
     }
     
     /**
-     * Permet de récupérer le premier résultat de la fonction load
+     * Permet de rÃ©cupÃ©rer le premier rÃ©sultat de la fonction load
      */
     function loadOne($foreing_keys = false, $where = array(), $orderby = '')
     {
