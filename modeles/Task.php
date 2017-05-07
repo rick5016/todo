@@ -91,6 +91,27 @@ class Task extends BDD
         return null;
     }
     
+    function count()
+    {
+        $result = 0;
+        try {
+            $query = "select count(*) as nbPerforme from performe where idTask = " . $this->id;
+
+            $stmt  = $this->dbh->query($query);
+            if ($stmt)
+            {
+                while($data = $stmt->fetch()) {
+                    $result = $data['nbPerforme'];
+                }  
+            }
+        }
+        catch (PDOException $e) {
+            var_dump($e->getMessage().' At line '.$e->getLine());
+            exit;
+        }
+        return $result;
+    }
+    
     function loadInbox($priority = "11111")
     {
         $result = array();

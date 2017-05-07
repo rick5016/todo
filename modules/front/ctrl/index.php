@@ -75,8 +75,8 @@ function task($vars)
         }
     }
     $vars['projects']     = Project::factory('project')->load(false);
-    $vars['project_id']         = (isset($project_id)) ? true : null;
     $vars['task']         = (isset($task)) ? true : null;
+    $vars['project_id']   = (isset($project_id)) ? $project_id : '';
     $vars['task_name']    = (isset($task_name)) ? $task_name : '';
     $vars['priority']     = (isset($priority)) ? $priority : '';
     $vars['dateStart']    = (isset($dateStart)) ? $dateStart : '';
@@ -116,7 +116,7 @@ function inbox($vars)
         $afficher_la_tache = true;
 
         // Afficher ou non les dates après Aujourd'hui
-        if (!isset($vars['ant']) && $task->dateStart > date('Y-m-d')) {
+        if (!isset($vars['ant']) && $task->dateStart > date('Y-m-d H:i')) {
             $afficher_la_tache = false;
         }
         
@@ -136,9 +136,31 @@ function inbox($vars)
                 $afficher_la_tache = false;
             }
             
-            if ($afficher_la_tache) {
-                $tri[$date_affichage . '-' . $task->priority . '-' . $task->id][] = $task;
+            if ($afficher_la_tache)
+            {
+                $date_affichage_dateTime    = new DateTime($date_affichage);
+                $dateStart_dateTime         = new DateTime($task->dateStart);
+                $dateEnd_dateTime           = new DateTime($task->dateEnd);
+                $timeStart                  = $dateStart_dateTime->format('H:i');
+                $timeEnd                    = $dateEnd_dateTime->format('H:i');
+                $moment = 3; // Toute la journée
+                if ($timeStart != "00:00" || $timeEnd != "00:00")
+                {
+                    if ($timeStart == "00:00" and $timeEnd == "11:59") {
+                        $moment = 1; // Matin
+                    } elseif ($timeStart == "12:00" && ($timeEnd == "17:59" || $timeEnd == "23:59")) {
+                        $moment = 2; // Après-midi et soir
+                    } elseif ($timeStart == "18:00" and $timeEnd == "23:59") {
+                        $moment = 4; // soir
+                    }
+                }
+                
+                // TODO : ordre a revoir 
+                // 1 : en fonction de l'heure de la journée
+                // 2 : les tâches ne se finissant pas aujourd'hui doivent etre en fin de liste
+                $tri[$date_affichage_dateTime->format('Y-m-d') . '-' . $moment . '-' . $task->priority . '-' . $task->id][] = $task;
             }
+            $task->nbPerforme = $task->count();
         }
     }
     ksort($tri);

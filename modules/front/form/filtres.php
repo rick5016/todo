@@ -47,6 +47,25 @@ class filtres extends form
         {
             $vars['ant'] = true;
         }
+        
+        // Voir les tâches après
+        if (isset($datas['details']) && isset($datas['filtrer']))
+        {
+            $vars['details'] = true;
+            if ($save) {
+                $_SESSION['voir_details'] = true;
+            }
+        }
+        elseif(isset($datas['filtrer']))
+        {
+            if ($save) {
+                unset($_SESSION['voir_details']);
+            }
+        }
+        elseif(isset($_SESSION['voir_details']) && $save)
+        {
+            $vars['details'] = true;
+        }
         return $vars;
     }
 }

@@ -24,11 +24,10 @@
             <span>Priorité</span>
         </p>
         <div style="padding:0;margin-left: 25px;">
+            <input type="radio" {% if priority == 0 %}checked="checked" {% endif %}name="priority" value="0" /><span style="color:#c0c0c0;font-weight:bold"> 0</span>
             <input type="radio" {% if priority == 1 %}checked="checked" {% endif %}name="priority" value="1" /><span style="color:#d9534f;font-weight:bold"> 1</span>
             <input type="radio" {% if priority == 2 %}checked="checked" {% endif %}name="priority" value="2" /><span style="color:#f0ad4e;font-weight:bold"> 2</span>
-            <input type="radio" {% if priority == 3 %}checked="checked" {% endif %}name="priority" value="3" /><span style="color:#337ab7;font-weight:bold"> 3</span>
-            <input type="radio" {% if priority == 4 %}checked="checked" {% endif %}name="priority" value="4" /><span style="color:#5bc0de;font-weight:bold"> 4</span>
-            <input type="radio" {% if priority == 0 %}checked="checked" {% endif %}name="priority" value="0" /><span style="color:#c0c0c0;font-weight:bold"> 0</span>
+            <input type="radio" {% if priority == 3 %}checked="checked" {% endif %}name="priority" value="3" /><span style="color:#e8dc00;font-weight:bold"> 3</span>
         </div>
     </div>
     <div>
