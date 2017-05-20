@@ -12,6 +12,8 @@ class Task extends BDD
         'priority'              => 'priority',
         'dateStart'             => 'dateStart',
         'dateEnd'               => 'dateEnd',
+        'dateStartOrigine'      => 'dateStartOrigine',
+        'dateEndOrigine'        => 'dateEndOrigine',
         'reiterate'             => 'reiterate', // Tous les
         'interspace'            => 'interspace', // intervalle entre les itérations
         'reiterateEnd'          => 'reiterateEnd', // Jusqu'à (toujours/custom)
@@ -112,7 +114,7 @@ class Task extends BDD
         return $result;
     }
     
-    function loadInbox($priority = "11111")
+    function loadInbox($clause = array(), $priority = "11111")
     {
         $result = array();
         if ($priority == "00000") {
@@ -134,6 +136,29 @@ class Task extends BDD
                     limit 1
                 )
                 where (reiterate != 0 OR (reiterate = 0 AND performe.id is null))';
+            
+            if (count($clause) > 0)
+            {
+                // Ajout de la clause where
+                $nbWhere = count($clause);
+                if ($nbWhere > 0)
+                {
+                    $query .= " and";
+                    foreach ($clause as $key => $value)
+                    {
+                        if (is_numeric($key)) {
+                            $query .= ' ' . $value;
+                        } else {
+                            $query .= ' ' . $key . ' = ' . $value;
+                        }
+                    }
+                    $nbWhere--;
+                    if ($nbWhere > 0) {
+                        $query .= ' and';
+                    }
+                }
+            }
+            
             if ($priority != "11111")
             {
                 $query .= " and priority IN (";
@@ -203,7 +228,13 @@ class Task extends BDD
                     $this->setDateStart($newDateTimeStart->format('Y-m-d H:i'));
                     
                     // Calcul de la date de fin
-                    $newDateTimeStart->add(new DateInterval('P' . $interval . 'D'));
+                    $reiterate_type = 'D';
+                    if ($this->reiterate == 3) {
+                        $reiterate_type = 'M';
+                    } elseif ($this->reiterate == 4) {
+                        $reiterate_type = 'Y';
+                    }
+                    $newDateTimeStart->add(new DateInterval('P' . $interval . $reiterate_type));
                     $this->setDateEnd($newDateTimeStart->format('Y-m-d') . ' ' . $dateTimeEnd->format('H:i'));
 
                     parent::save();
@@ -230,14 +261,16 @@ class Task extends BDD
      * @param int $interval
      * @return string type
      */
-    function getNewDate($dateParam, $reiterate, $interval, $search = 'next')
+    function getNewDate($dateParam, $reiterate, $interval, $search = 'next', $dateCompare = null)
     {
         $dateTimeOrigine    = new DateTime($dateParam);
         $date               = $dateTimeOrigine->format('Y-m-d');
         $lastDate           = $date;
-        $today              = date('Y-m-d');
+        if (!isset($dateCompare)) {
+            $dateCompare = date('Y-m-d');
+        }
         
-        while ($date <= $today)
+        while ($date <= $dateCompare)
         {
             $lastDate = $date;
             

@@ -19,15 +19,15 @@ include_once("modules/front/ctrl/index.php");
 if (isset($_GET['page']))
 {
     $func = $_GET['page'];
-    if ($_GET['page'] == "task")
+    if ($func == "task")
     {
         $vars = $func($vars);
     }
-    elseif ($_GET['page'] == "inbox")
+    elseif ($func == "inbox")
     {
         $vars = $func($vars);
     }
-    elseif ($_GET['page'] == "today")
+    elseif ($func == "cal")
     {
         $vars = $func($vars);
     }

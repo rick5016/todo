@@ -37,15 +37,16 @@
             <div class="floated menu" style="height:100%;background-color:#F5F5F5">
                 <div style="border: 1px black dotted;text-align:center;margin-right:20px;margin-bottom: 20px;">{{ "now"|date('d/m/Y H:i', timezone="Europe/Paris") }}</div>
                 <ul style="list-style-type:none;">
+                    <li><a href="index.php?page=inbox&filtre=today"><span title="boîte de réception" class="glyphicon glyphicon-calendar"></span> Aujourd'hui</a></li>
                     <li><a href="index.php?page=task"><span title="ajouter" class="glyphicon glyphicon-plus"></span> Ajouter une tâche</a></li>
                     <li><a href="index.php?page=inbox"><span title="boîte de réception" class="glyphicon glyphicon-inbox"></span> Boîte de réception</a></li>
-                    <li><a href="index.php?page=inbox&filtre=today"><span title="boîte de réception" class="glyphicon glyphicon-calendar"></span> Aujourd'hui</a></li>
+                    <li><a href="index.php?page=cal"><span title="calendrier" class="glyphicon glyphicon-calendar"></span> Calendrier</a></li>
                 </ul>
                 <div style="text-align:center"><span><a href="">Projets</a> / <a href="">Labels</a> / <a href="">Filtres</a></span></div>
                 <div id="links_project">
                     <ul>
                     {% for project in projects %}
-                        <li><a href="?filtre=project&id={{ project.id }}">{{ project.name }}</a></li>
+                        <li><a href="?page=inbox&filtre=project&id={{ project.id }}">{{ project.name }}</a></li>
                     {% endfor %}
                     </ul>
                 </div>
@@ -62,6 +63,8 @@
                     <script>window.location="index.php?page=inbox";</script>
                 {% elseif page == 'inbox' %}
                     {% include('/front/views/inbox.tpl') %}
+                {% elseif page == 'cal' %}
+                    {% include('/front/views/cal.tpl') %}
                 {% elseif page == 'today' %}
                     {% include('/front/views/today.tpl') %}
                 {% elseif page == 'task' %}

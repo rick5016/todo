@@ -271,10 +271,11 @@ class BDD
                     } else {
                         $query .= ' ' . $key . ' = ' . $value;
                     }
+                    $nbWhere--;
+                    if ($nbWhere > 0) {
+                        $query .= ' and';
+                    }
                 }
-                $nbWhere--;
-                if ($nbWhere > 0)
-                    $query .= ' and';
             }
 
             // Ajout de l'order by

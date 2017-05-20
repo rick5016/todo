@@ -1,5 +1,5 @@
 {% set jourMois = '' %}
-{% set displayHr = true %}
+{% set today = true %}
 <div>
     <a href="?page=inbox&priority={% if priority|slice(0, 1) == '1' %}{{ '0' ~ priority|slice(1, 4)}}{% else %}{{ '1' ~ priority|slice(1, 4)}}{% endif %}">
         <span{% if priority|slice(0, 1) == '1' %} class="btn btn-primary"{% else %} class="btn btn-default"{% endif %}>Défaut</span>
@@ -14,7 +14,7 @@
         <span{% if priority|slice(3, 1) == '1' %} class="btn btn-primary" style="background-color:#e8dc00;border-color:#e8dc00"{% else %} class="btn btn-default"{% endif %}>Priorité 3</span>
     </a>
 </div>
-{% if today is not defined %}
+{% if filtre_today is not defined %}
     <script>
       $(function() {
         $('#past').change(function() {
@@ -65,9 +65,9 @@
     {% set dateStart = task.dateAffichage|date('Y-m-d', timezone="Europe/Paris") %}
     
     <!-- Gere la ligne entre les tâches anterieures à la date du jour et les autres -->
-    {% if dateStart > "now"|date('Y-m-d', timezone="Europe/Paris") and displayHr %}
+    {% if dateStart > "now"|date('Y-m-d', timezone="Europe/Paris") and today %}
         <!--<hr style="border-bottom: 1px solid #F5F5F5;" />-->
-        {% set displayHr = false %}
+        {% set today = false %}
     {% endif %}
 
     <!-- Gestion de l'affichage du mois et du jour -->
@@ -102,7 +102,7 @@
     {% endif %}
     
     {% set padding = "5" %}
-    {% if displayHr == false and performes|length > 0 %}
+    {% if today == false and performes|length > 0 %}
         {% set padding = "10" %}
     {% endif %}
     
@@ -110,58 +110,78 @@
         <div title="Priorité {{ task.priority }}" style="float:right;background:{{ priorityColor }};margin-right: 13px;margin-top: 13px;border-radius:50%;width:15px;height:15px;"></div>
         <div style="float:right;margin-top: 4px;">{{ task.nbPerforme }} fois</div>
         <li style="list-style-type:none;background-color: {{ backgroundColor }};height: 46px;border-bottom: 1px solid #ddd;padding:{{ padding }}px;">
-            {% if displayHr and 
-                (
-                    task.dateStart|date('Y-m-d H:i', timezone="Europe/Paris") < "now"|date('Y-m-d H:i', timezone="Europe/Paris") or 
-                    task.dateEnd|date('Y-m-d H:i', timezone="Europe/Paris") == "now"|date('Y-m-d', timezone="Europe/Paris") ~ " 00:00"
-                ) %}
-            <a title="valider" href="index.php?page=done&id={{ task.id }}">
-                <span title="valider" class="glyphicon glyphicon-ok-circle" style="font-size: 35;vertical-align:-30%;"></span>
-                <span title="valider" >
-                    <b>{{ task.name }}</b> 
-                </span>
-            </a> 
-            <a href="index.php?page=task&id={{ task.id }}"><span title="modifier" class="glyphicon glyphicon-edit"></span></a> <a title="supprimer" href="index.php?page=del&id={{ task.id }}"><span class="glyphicon glyphicon-remove"></span></a>
+            
+            {% if today and task.dateStart|date('Y-m-d H:i', timezone="Europe/Paris") < "now"|date('Y-m-d H:i', timezone="Europe/Paris") %} <!-- Aujourd'hui : Lien glyphicon valider -->
+                <div style="float:left;height:100%;padding:0 7px 0 0;">
+                    <a title="valider" href="index.php?page=done&id={{ task.id }}">
+                        <span title="valider" class="glyphicon glyphicon-ok-circle" style="font-size: 35px;vertical-align:-38%;"></span>
+                        <span title="valider" >
+                            <b>{{ task.name }}</b> 
+                        </span>
+                    </a>
+                </div>
                 
             {% else %}
-                {% if displayHr == false and performes|length > 0 %}
+            
+                {% if today == false and performes|length > 0 %} <!-- Demain : lien glyphicon annuler -->
                     {% set performe = performes.0 %}
-                    <a href="index.php?page=cancel&id={{ task.id }}&idPerforme={{ performe.id }}">
-                        <span title="Annuler" class="glyphicon glyphicon-remove-circle" style="font-size: 25;vertical-align:-27%;"></span>
-                    </a>
+                    <div style="float:left;height:100%;padding:0 7px 0 0;">
+                        <a href="index.php?page=cancel&id={{ task.id }}&idPerforme={{ performe.id }}">
+                            <span title="Annuler" class="glyphicon glyphicon-remove-circle" style="font-size: 25px;vertical-align:-22%;"></span>
+                        </a>
                         <span style="color:#8f8f8f">
                             <b>{{ task.name }}</b> 
                         </span>
-                {% else %}
-                    <span>
+                    </div>
+                {% else %} <!-- Aujourd'hui (mais pas encore l'heure) : aucun glyphicon -->
+                <div style="float:left;height:100%;width:38px;"></div>
+                <div style="float:left;height:100%;padding-top: 6px;padding-left: 0;">
+                    <span style="color:#8f8f8f">
                         <b>{{ task.name }}</b> 
                     </span>
+                </div>
                 {% endif %}
+                
+            {% endif %}
+                
+            <div style="float:left;height:100%;padding-top: 6px;padding-left: 0;">
                 <a href="index.php?page=task&id={{ task.id }}"><span title="modifier" class="glyphicon glyphicon-edit"></span></a> <a title="supprimer" href="index.php?page=del&id={{ task.id }}"><span class="glyphicon glyphicon-remove"></span></a>
-            {% endif %}
+            </div>
+                
             {% if details is defined %}
-                {% if task.reiterate == 1 %} - Tous les {{ task.interspace }} jour(s){% elseif task.reiterate == 2 %} - Toutes les {{ task.interspace }} semaine(s){% elseif task.reiterate == 3 %} - Tous les {{ task.interspace }} mois{% elseif task.reiterate == 4 %} - Toutes les {{ task.interspace }} année(s){% endif %}
-            {% endif %}
-            {% if task.dateStart|date('d/m/Y', timezone="Europe/Paris") != task.dateEnd|date('d/m/Y', timezone="Europe/Paris") %}
-                {% if details is defined %}
-                     du {{ task.dateStart|date('d/m/Y', timezone="Europe/Paris") }}
-                    {% if task.dateStart|date('H:i', timezone="Europe/Paris") != task.dateStart|date('H:i', timezone="Europe/Paris") %} {{ task.dateEnd|date('H:i', timezone="Europe/Paris") }} {% endif %}
-                     au {{ task.dateEnd|date('d/m/Y', timezone="Europe/Paris") }}
-                    {% if task.dateEnd|date('H:i', timezone="Europe/Paris") != task.dateEnd|date('H:i', timezone="Europe/Paris") %} {{ task.dateEnd|date('H:i', timezone="Europe/Paris") }} {% endif %}
-                {% endif %}
+                <div style="float:left;height:100%;padding-top: 5px;padding-left: 0;">
+                    {% if task.reiterate == 1 %} - Tous les {{ task.interspace }} jour(s){% elseif task.reiterate == 2 %} - Toutes les {{ task.interspace }} semaine(s){% elseif task.reiterate == 3 %} - Tous les {{ task.interspace }} mois{% elseif task.reiterate == 4 %} - Toutes les {{ task.interspace }} année(s){% endif %}
+                </div>
             {% else %}
-                 {% if task.dateStart|date('H:i', timezone="Europe/Paris") != "00:00" or task.dateEnd|date('H:i', timezone="Europe/Paris") != "00:00" %}
-                    {% if task.dateStart|date('H:i', timezone="Europe/Paris") == "00:00" and task.dateEnd|date('H:i', timezone="Europe/Paris") == "11:59" %}
-                         le matin
-                    {% elseif task.dateStart|date('H:i', timezone="Europe/Paris") == "12:00" and (task.dateEnd|date('H:i', timezone="Europe/Paris") == "17:59" or task.dateEnd|date('H:i', timezone="Europe/Paris") == "23:59") %}
-                         l'après-midi
-                    {% elseif task.dateStart|date('H:i', timezone="Europe/Paris") == "18:00" and task.dateEnd|date('H:i', timezone="Europe/Paris") == "23:59" %}
-                         le soir
-                    {% else %}
-                         De {{ task.dateStart|date('H:i', timezone="Europe/Paris") }} à  {{ task.dateEnd|date('H:i', timezone="Europe/Paris") }}
-                    {% endif %}
-                 {% endif %}
+                {% if task.dateStart|date('d/m/Y', timezone="Europe/Paris") != task.dateEnd|date('d/m/Y', timezone="Europe/Paris") %}
+                    <div style="float:left;height:100%;padding-top: 5px;padding-left: 0;">
+                        Jusqu'au {{ task.dateEnd|date('d/m/Y', timezone="Europe/Paris") }}
+                    </div>
+                {% endif %}
             {% endif %}
+            
+            <div style="float:left;height:100%;padding-top: 5px;padding-left: 0;">
+                {% if task.dateStart|date('d/m/Y', timezone="Europe/Paris") != task.dateEnd|date('d/m/Y', timezone="Europe/Paris") %}
+                    {% if details is defined %}
+                         du {{ task.dateStart|date('d/m/Y', timezone="Europe/Paris") }}
+                        {% if task.dateStart|date('H:i', timezone="Europe/Paris") != task.dateStart|date('H:i', timezone="Europe/Paris") %} {{ task.dateEnd|date('H:i', timezone="Europe/Paris") }} {% endif %}
+                         au {{ task.dateEnd|date('d/m/Y', timezone="Europe/Paris") }}
+                        {% if task.dateEnd|date('H:i', timezone="Europe/Paris") != task.dateEnd|date('H:i', timezone="Europe/Paris") %} {{ task.dateEnd|date('H:i', timezone="Europe/Paris") }} {% endif %}
+                    {% endif %}
+                {% else %}
+                     {% if task.dateStart|date('H:i', timezone="Europe/Paris") != "00:00" or task.dateEnd|date('H:i', timezone="Europe/Paris") != "00:00" %}
+                        {% if task.dateStart|date('H:i', timezone="Europe/Paris") == "00:00" and task.dateEnd|date('H:i', timezone="Europe/Paris") == "11:59" %}
+                             le matin
+                        {% elseif task.dateStart|date('H:i', timezone="Europe/Paris") == "12:00" and (task.dateEnd|date('H:i', timezone="Europe/Paris") == "17:59" or task.dateEnd|date('H:i', timezone="Europe/Paris") == "23:59") %}
+                             l'après-midi
+                        {% elseif task.dateStart|date('H:i', timezone="Europe/Paris") == "18:00" and task.dateEnd|date('H:i', timezone="Europe/Paris") == "23:59" %}
+                             le soir
+                        {% else %}
+                             De {{ task.dateStart|date('H:i', timezone="Europe/Paris") }} à  {{ task.dateEnd|date('H:i', timezone="Europe/Paris") }}
+                        {% endif %}
+                     {% endif %}
+                {% endif %}
+            </div>
         </li>
         <div style="clear:both;padding: 0;"></div>
     </ul>
