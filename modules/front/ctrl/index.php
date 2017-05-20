@@ -221,142 +221,77 @@ function cal($vars)
     
     for($i=0;$i<6;$i++)
     {
-            for($j=0;$j<7;$j++)
+        for($j=0;$j<7;$j++)
+        {
+            if($j+1 == $int_premj && $t == 1) // on stocke le premier jour du mois
             {
-                // on met les tâche ($tasks) dans les bonne cases
-                
-                if($j+1 == $int_premj && $t == 1) // on stocke le premier jour du mois
-                {
-                    $data = array($t);
-                    $date = $num_an . '-' . str_pad($num_mois, 2, 0, STR_PAD_LEFT) . '-' . str_pad($t, 2, 0, STR_PAD_LEFT);
-                    $date_compare = $date . ' 00:00:00';
-                    foreach ($tasks as $task)
-                    {
-                        $reiterate                  = $task->reiterate;
-                        $dateStartOrigine           = $task->dateStartOrigine;
-                        $dateEndOrigine_datetime    = new DateTime($task->dateEndOrigine);
-                        $dateEndOrigine             = $dateEndOrigine_datetime->format('Y-m-d') . ' 23:59:59';
-                        if ($reiterate > 0 && !($dateStartOrigine <= $date_compare && $date_compare <= $dateEndOrigine))
-                        {
-                            $dateStartOrigine = $task->getNewDate($dateStartOrigine, $reiterate, $task->interspace, 'last', $date);
-                            $dateStartOrigine_datetime = new DateTime($dateStartOrigine);
-                            $dateStartOrigine_datetime->add(new DateInterval('P' . $task->interspace . 'D'));
-                            $dateEndOrigine = $dateStartOrigine_datetime->format('Y-m-d') . ' 23:59:59';
-                            $task->setDateStartOrigine($dateStartOrigine);
-//                            $task->setDateEndOrigine($dateEndOrigine);
-                        }
-                        if ($dateStartOrigine <= $date_compare && $date_compare <= $dateEndOrigine)
-                        {
-                            $performe = 0;
-                            $performeSearch = BDD::factory('performe')->loadOne(false, array('idTask' => $task->id, "created >= '$dateStartOrigine' and created <= '$dateEndOrigine'"));
-                            if ($performeSearch) {
-                                $performe = 1;
-                            }
-                            elseif ($date > date('Y-m-d')) {
-                                $performe = 2;
-                            }
-                            $data[] = array($task, $performe);
-                        }
-                    }
-                    $tab_cal[$i][$j] = $data;
-                    $t++;
-                }
-                elseif($t > 1 && $t <= $int_nbj) // on incremente a chaque fois...
-                {
-                    $data = array($p.$t);
-                    $date = $num_an . '-' . str_pad($num_mois, 2, 0, STR_PAD_LEFT) . '-' . str_pad($t, 2, 0, STR_PAD_LEFT);
-                    $date_compare = $date . ' 00:00:00';
-                    foreach ($tasks as $task)
-                    {
-                        if ($task->id == 46 && $num_mois == 6)
-                        {
-                            $fsdf = 1;
-                        }
-                        $reiterate                  = $task->reiterate;
-                        $dateStartOrigine           = $task->dateStartOrigine;
-                        $dateEndOrigine_datetime    = new DateTime($task->dateEndOrigine);
-                        $dateEndOrigine             = $dateEndOrigine_datetime->format('Y-m-d') . ' 23:59:59';
-                        if ($reiterate > 0 && !($dateStartOrigine <= $date_compare && $date_compare <= $dateEndOrigine))
-                        {
-                            $dateStartOrigine = $task->getNewDate($dateStartOrigine, $reiterate, $task->interspace, 'last', $date);
-                            $dateStartOrigine_datetime = new DateTime($dateStartOrigine);
-                            $reiterate_type = 'D';
-                            if ($reiterate == 3) {
-                                $reiterate_type = 'M';
-                            } elseif ($reiterate == 4) {
-                                $reiterate_type = 'Y';
-                            }
-                            $dateStartOrigine_datetime->add(new DateInterval('P' . $task->interspace . $reiterate_type));
-                            $dateEndOrigine = $dateStartOrigine_datetime->format('Y-m-d') . ' 23:59:59';
-                            $task->setDateStartOrigine($dateStartOrigine);
-//                            $task->setDateEndOrigine($dateEndOrigine);
-                        }
-                        if ($dateStartOrigine <= $date_compare && $date_compare <= $dateEndOrigine)
-                        {
-                            $performe = 0;
-                            $performeSearch = BDD::factory('performe')->loadOne(false, array('idTask' => $task->id, "created >= '$dateStartOrigine' and created <= '$dateEndOrigine'"));
-                            if ($performeSearch) {
-                                $performe = 1;
-                            }
-                            elseif ($date > date('Y-m-d')) {
-                                $performe = 2;
-                            }
-                            $data[] = array($task, $performe);
-                        }
-                    }
-                    $tab_cal[$i][$j] = $data;
-                    $t++;
-                }
-                elseif($t > $int_nbj) // on a mis tout les numeros de ce mois, on commence a mettre ceux du suivant
-                {
-                    $t = 1;
-                    $num_mois++;
-                    $p="*";
-                    $data = array($p."1");
-                    $date = $num_an . '-' . str_pad($num_mois, 2, 0, STR_PAD_LEFT) . '-' . str_pad($t, 2, 0, STR_PAD_LEFT);
-                    $date_compare = $date . ' 00:00:00';
-                    foreach ($tasks as $task)
-                    {
-                        $reiterate                  = $task->reiterate;
-                        $dateStartOrigine           = $task->dateStartOrigine;
-                        $dateEndOrigine_datetime    = new DateTime($task->dateEndOrigine);
-                        $dateEndOrigine             = $dateEndOrigine_datetime->format('Y-m-d') . ' 23:59:59';
-                        if ($reiterate > 0 && !($dateStartOrigine <= $date_compare && $date_compare <= $dateEndOrigine))
-                        {
-                            $dateStartOrigine = $task->getNewDate($dateStartOrigine, $reiterate, $task->interspace, 'last', $date);
-                            $dateStartOrigine_datetime = new DateTime($dateStartOrigine);
-                            $dateStartOrigine_datetime->add(new DateInterval('P' . $task->interspace . 'D'));
-                            $dateEndOrigine = $dateStartOrigine_datetime->format('Y-m-d') . ' 23:59:59';
-                            $task->setDateStartOrigine($dateStartOrigine);
-//                            $task->setDateEndOrigine($dateEndOrigine);
-                        }
-                        if ($dateStartOrigine <= $date_compare && $date_compare <= $dateEndOrigine)
-                        {
-                            $performe = 0;
-                            $performeSearch = BDD::factory('performe')->loadOne(false, array('idTask' => $task->id, "created >= '$dateStartOrigine' and created <= '$dateEndOrigine'"));
-                            if ($performeSearch) {
-                                $performe = 1;
-                            }
-                            elseif ($date > date('Y-m-d')) {
-                                $performe = 2;
-                            }
-                            $data[] = array($task, $performe);
-                        }
-                    }
-                    $tab_cal[$i][$j] = $data;
-                    $t++;
-                }
-                elseif($t == 1) // on a pas encore mis les num du mois, on met ceux de celui d'avant
-                {
-                    $data = array("*".($int_nbjAV-($int_premj-($j+1))+1));
-                    $tab_cal[$i][$j] = $data;
-                }
+                $tab_cal[$i][$j] = _calDay($p.$t, $num_an, $num_mois, $t, $tasks);
+                $t++;
             }
+            elseif($t > 1 && $t <= $int_nbj) // on incremente a chaque fois...
+            {
+                $tab_cal[$i][$j] = _calDay($p.$t, $num_an, $num_mois, $t, $tasks);
+                $t++;
+            }
+            elseif($t > $int_nbj) // on a mis tout les numeros de ce mois, on commence a mettre ceux du suivant
+            {
+                $t = 1;
+                $num_mois++;
+                $p="*";
+                $tab_cal[$i][$j] = _calDay($p.$t, $num_an, $num_mois, $t, $tasks);
+                $t++;
+            }
+            elseif($t == 1) // on a pas encore mis les num du mois, on met ceux de celui d'avant
+            {
+                $tab_cal[$i][$j] = _calDay("*".($int_nbjAV-($int_premj-($j+1))+1), $num_an, $num_mois, $t, $tasks);
+            }
+        }
     }
     $vars['tab_cal']    = $tab_cal;
 
     return $vars;
     
+}
+
+function _calDay($day, $num_an, $num_mois, $t, $tasks)
+{
+    $data = array($day);
+    $date = $num_an . '-' . str_pad($num_mois, 2, 0, STR_PAD_LEFT) . '-' . str_pad($t, 2, 0, STR_PAD_LEFT);
+    $date_compare = $date . ' 00:00:00';
+    foreach ($tasks as $task)
+    {
+        $reiterate                  = $task->reiterate;
+        $dateStartOrigine           = $task->dateStartOrigine;
+        $dateStartOrigine_datetime    = new DateTime($task->dateStartOrigine);
+        $dateEndOrigine_datetime    = new DateTime($task->dateEndOrigine);
+        $dateEndOrigine             = $dateEndOrigine_datetime->format('Y-m-d') . ' 23:59:59';
+        if ($reiterate > 0 && !($dateStartOrigine <= $date_compare && $date_compare <= $dateEndOrigine))
+        {
+            // Calcul de l'interval
+            $diff = $dateStartOrigine_datetime->diff($dateEndOrigine_datetime);
+            $interval = $diff->format('%a');
+
+            $dateStartOrigine = $task->getNewDate($dateStartOrigine, $reiterate, $task->interspace, 'last', $date);
+            $dateStartOrigine_datetime = new DateTime($dateStartOrigine);
+            $dateStartOrigine_datetime->add(new DateInterval('P' . $interval . 'D'));
+            $dateEndOrigine = $dateStartOrigine_datetime->format('Y-m-d') . ' 23:59:59';
+            $task->setDateStartOrigine($dateStartOrigine);
+            $task->setDateEndOrigine($dateEndOrigine);
+        }
+        if ($dateStartOrigine <= $date_compare && $date_compare <= $dateEndOrigine)
+        {
+            $performe = 0;
+            $performeSearch = BDD::factory('performe')->loadOne(false, array('idTask' => $task->id, "created >= '$dateStartOrigine' and created <= '$dateEndOrigine'"));
+            if ($performeSearch) {
+                $performe = 1;
+            }
+            elseif ($date > date('Y-m-d')) {
+                $performe = 2;
+            }
+            $data[] = array($task, $performe);
+        }
+    }
+    return $data;
 }
 
 function del()

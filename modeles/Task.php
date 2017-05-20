@@ -228,13 +228,7 @@ class Task extends BDD
                     $this->setDateStart($newDateTimeStart->format('Y-m-d H:i'));
                     
                     // Calcul de la date de fin
-                    $reiterate_type = 'D';
-                    if ($this->reiterate == 3) {
-                        $reiterate_type = 'M';
-                    } elseif ($this->reiterate == 4) {
-                        $reiterate_type = 'Y';
-                    }
-                    $newDateTimeStart->add(new DateInterval('P' . $interval . $reiterate_type));
+                    $newDateTimeStart->add(new DateInterval('P' . $interval . 'D'));
                     $this->setDateEnd($newDateTimeStart->format('Y-m-d') . ' ' . $dateTimeEnd->format('H:i'));
 
                     parent::save();
