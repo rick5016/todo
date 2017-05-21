@@ -61,6 +61,8 @@ function task($vars)
 
             $task->setDateStart($dateStartSave);
             $task->setDateEnd($dateEndSave);
+            $task->setDateStartOrigine($dateStartSave);
+            $task->setDateEndOrigine($dateEndSave);
             $task->reiterate    = $repeat;
             $task->interspace   = $interspace;
             $task->reiterateEnd = $reiterateEnd;

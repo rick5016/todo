@@ -62,6 +62,40 @@ class Task extends BDD
         }
     }
     
+    function setDateStartOrigine($dateStart)
+    {
+        if (strpos($dateStart, '/'))
+        {
+            $arrayDateTime   = explode(' ', $dateStart); // Time
+            $arrayDate       = explode('/', $arrayDateTime[0]);
+            if (isset($arrayDateTime[1])) {
+                $this->dateStartOrigine = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . ' ' . $arrayDateTime[1];
+            } else {
+                $this->dateStartOrigine = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . " 00:00:00";
+            }
+        }
+        else {
+            $this->dateStartOrigine = $dateStart;
+        }
+    }
+
+    function setDateEndOrigine($dateEnd)
+    {
+        if (strpos($dateEnd, '/'))
+        {
+            $arrayDateTime   = explode(' ', $dateEnd); // Time
+            $arrayDate       = explode('/', $arrayDateTime[0]);
+            if (isset($arrayDateTime[1])) {
+                $this->dateEndOrigine = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . ' ' . $arrayDateTime[1];
+            } else {
+                $this->dateEndOrigine = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . " 00:00:00";
+            }
+        }
+        else {
+            $this->dateEndOrigine = $dateEnd;
+        }
+    }
+    
     function getDateStart($display = false)
     {
         if ($display)
