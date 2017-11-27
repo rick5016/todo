@@ -1,6 +1,6 @@
 <?php
-include_once('modules/common/form/form.php');
-class filtres extends form
+//include_once('modules/common/form/form.php');
+class Form_filtres extends form
 {
    
     function __construct()

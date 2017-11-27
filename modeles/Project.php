@@ -1,6 +1,5 @@
 <?php
 
-include_once 'modeles/BDD.php';
 class Project extends BDD
 {
 

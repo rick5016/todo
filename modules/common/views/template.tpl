@@ -37,8 +37,8 @@
             <div class="floated menu" style="height:100%;background-color:#F5F5F5">
                 <div style="border: 1px black dotted;text-align:center;margin-right:20px;margin-bottom: 20px;">{{ "now"|date('d/m/Y H:i', timezone="Europe/Paris") }}</div>
                 <ul style="list-style-type:none;">
-                    <li><a href="index.php?page=inbox&filtre=today"><span title="boîte de réception" class="glyphicon glyphicon-calendar"></span> Aujourd'hui</a></li>
-                    <li><a href="index.php?page=task"><span title="ajouter" class="glyphicon glyphicon-plus"></span> Ajouter une tâche</a></li>
+                    <li><a href="/inbox?filtre=today"><span title="boîte de réception" class="glyphicon glyphicon-calendar"></span> Aujourd'hui</a></li>
+                    <li><a href="/task"><span title="ajouter" class="glyphicon glyphicon-plus"></span> Ajouter une tâche</a></li>
                     <li><a href="index.php?page=inbox"><span title="boîte de réception" class="glyphicon glyphicon-inbox"></span> Boîte de réception</a></li>
                     <li><a href="index.php?page=cal"><span title="calendrier" class="glyphicon glyphicon-calendar"></span> Calendrier</a></li>
                 </ul>
@@ -53,6 +53,11 @@
             </div>
             <div class="sep"></div>
             <div class="floated content">
+                {{ content|raw }} <br />
+                
+                
+                
+                
                 {% if page is not defined %}
                     Acceuil
                 {% elseif page == 'del' and id != null %}

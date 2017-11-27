@@ -5,7 +5,7 @@ class BDD
     public $dbh;
     private $dsn = 'mysql:dbname=todo;host=127.0.0.1';
     private $user = 'root';
-    private $password = '';
+    private $password = 'root';
 
     /**
      * Attention ramÃ¨ne TOUS les enfants
@@ -18,6 +18,11 @@ class BDD
     function __construct($datas = array(), $foreign_keys = false, $className = '', $limit = 200)
     {
         $this->dbh();
+        $this->populate($datas, $foreign_keys, $className, $limit);
+    }
+    
+    protected function populate($datas = array(), $foreign_keys = false, $className = '', $limit = 200)
+    {
         if (!empty($datas))
         {
             foreach ($this->attributs as $key => $attribut)
@@ -53,7 +58,8 @@ class BDD
             }
         }
     }
-    
+
+
     private function dbh()
     {
         if (!isset($this->dbh))
@@ -63,7 +69,7 @@ class BDD
                 $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
                 $this->dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
             } catch (PDOException $e) {
-                    echo 'Connexion Ã©chouÃ©e : ' . $e->getMessage();
+                    echo 'Connexion échouée : ' . $e->getMessage();
             }
         }
     }
@@ -286,7 +292,7 @@ class BDD
             if ($stmt) {
                 while($data = $stmt->fetch())
                 {
-                    $result[] = new $this->bdd_name($data, $foreing_keys);
+                    $this->populate($data, $foreing_keys);
                 }  
             }
         }
@@ -294,7 +300,7 @@ class BDD
             var_dump($e->getMessage().' At line '.$e->getLine());
             exit;
         }
-        return $result;
+        return $this;
     }
     
     /**

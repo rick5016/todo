@@ -1,6 +1,13 @@
 <?php
 
-Twig_Autoloader::register();
+class IndexController extends Controller
+{
+    function indexAction()
+    {
+//        echo $this->view->render(array());
+    }
+}
+/*Twig_Autoloader::register();
 $twig = new Twig_Environment( new Twig_Loader_Filesystem("./modules"),
     array( "cache" => false ) );
     //array( "cache" => "./temp/cache" ) );
@@ -45,4 +52,4 @@ if (isset($_GET['page']))
     }
 }
 $vars['projects']     = Project::factory('project')->load(false);
-echo $view->render($vars);
+echo $view->render($vars);*/

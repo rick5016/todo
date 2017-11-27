@@ -1,6 +1,5 @@
 <?php
 
-include_once 'modeles/BDD.php';
 class Task extends BDD
 {
 
@@ -220,7 +219,7 @@ class Task extends BDD
             if ($stmt)
             {
                 while ($data = $stmt->fetch()) {
-                    $result[] = new $this->bdd_name($data, true);
+                    $this->populate($data, true);
                 }
             }
         }
@@ -228,7 +227,7 @@ class Task extends BDD
             var_dump($e->getMessage().' At line '.$e->getLine());
             exit;
         }
-        return $result;
+        return $this;
     }
     
     function performe()
