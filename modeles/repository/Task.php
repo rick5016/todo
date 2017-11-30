@@ -1,31 +1,7 @@
 <?php
 
-class ORM_Task extends Model
+class Repository_Task extends ORM_Task
 {
-
-    protected $bdd_name  = 'task';
-    protected $attributs = array(
-        'id'                    => 'id',
-        'idProject'             => 'idProject',
-        'name'                  => 'name',
-        'priority'              => 'priority',
-        'dateStart'             => 'dateStart',
-        'dateEnd'               => 'dateEnd',
-        'dateStartOrigine'      => 'dateStartOrigine',
-        'dateEndOrigine'        => 'dateEndOrigine',
-        'reiterate'             => 'reiterate', // Tous les
-        'interspace'            => 'interspace', // intervalle entre les itérations
-        'reiterateEnd'          => 'reiterateEnd', // Jusqu'à (toujours/custom)
-        'untilDate'             => 'untilDate', // Jusqu'à une date
-        'untilNumber'           => 'untilNumber', // Jusqu'à un nombre de fois
-        'created'               => 'created',
-        'updated'               => 'updated'
-    );
-    protected $primary_key = 'id';
-    protected $foreign_keys = array(
-        'project' => array('project','idProject', 'id'),
-        'performes' => array('performe','id', 'idTask')
-    );
     
     function setDateStart($dateStart)
     {
@@ -138,6 +114,90 @@ class ORM_Task extends Model
                 while($data = $stmt->fetch()) {
                     $result = $data['nbPerforme'];
                 }  
+            }
+        }
+        catch (PDOException $e) {
+            var_dump($e->getMessage().' At line '.$e->getLine());
+            exit;
+        }
+        return $result;
+    }
+    
+    function loadInbox($clause = array(), $priority = "11111")
+    {
+        $result = array();
+        if ($priority == "00000") {
+            return $result;
+        }
+        
+        try {
+            $query = 'select 
+                project.id as project_id, project.name as project_name, project.created as project_created, project.updated as project_updated, 
+                task.id as task_id, task.name as task_name, idProject, priority, dateStart, dateEnd, reiterate, interspace, reiterateEnd, untilDate, untilNumber, task.created as task_created, task.updated as task_updated, 
+                performe.id as performe_id, idTask, performe.created as performe_created, performe.updated as performe_updated
+                from project
+                left join task on project.id = task.idProject
+                left join performe on task.id = performe.idTask and performe.created = 
+                (
+                        SELECT
+                    MAX(created)
+                    FROM performe
+                    where performe.idTask = task.id
+                    limit 1
+                )
+                where (reiterate != 0 OR (reiterate = 0 AND performe.id is null))';
+            
+            if (count($clause) > 0)
+            {
+                // Ajout de la clause where
+                $nbWhere = count($clause);
+                if ($nbWhere > 0)
+                {
+                    $query .= " and";
+                    foreach ($clause as $key => $value)
+                    {
+                        if (is_numeric($key)) {
+                            $query .= ' ' . $value;
+                        } else {
+                            $query .= ' ' . $key . ' = ' . $value;
+                        }
+                    }
+                    $nbWhere--;
+                    if ($nbWhere > 0) {
+                        $query .= ' and';
+                    }
+                }
+            }
+            
+            if ($priority != "11111")
+            {
+                $query .= " and priority IN (";
+                if (substr($priority, 0, 1) == '1') {
+                    $query .= '0,';
+                }
+                if (substr($priority, 1, 1) == '1') {
+                    $query .= '1,';
+                }
+                if (substr($priority, 2, 1) == '1') {
+                    $query .= '2,';
+                }
+                if (substr($priority, 3, 1) == '1') {
+                    $query .= '3,';
+                }
+                if (substr($priority, 4, 1) == '1') {
+                    $query .= '4,';
+                }
+                $query = substr($query, 0, -1);
+                $query .= ')';
+            }
+            $query .= ' order by dateStart, priority, performe_id desc';
+
+            $stmt  = $this->dbh->query($query);
+            if ($stmt)
+            {
+                while ($data = $stmt->fetch()) {
+                    $result[] = new ORM_Task($data, true);
+                }
             }
         }
         catch (PDOException $e) {
@@ -273,6 +333,52 @@ class ORM_Task extends Model
             var_dump($e->getMessage().' At line '.$e->getLine());
             exit;
         }
+    }
+    
+    public function saveTask($params, $task)
+    {
+        // Obligatoire
+        $project_id     = $params['project_id'];
+        $task_name      = $params['task_name'];
+        $priority       = isset($params['priority']) ? $params['priority'] : 0;
+        $dateStartSave  = $dateStart = Model::dateFormat($params['dateStart']);
+        $dateEndSave    = $dateEnd = Model::dateFormat($params['dateEnd']);
+        $timeStart      = $params['timeStart'];
+        $timeEnd        = $params['timeEnd'];
+        $repeat         = $params['repeat'];
+        $interspace     = $params['interspace'];
+        $reiterateEnd   = $params['reiterateEnd'];
+        if (!empty($params['untilDate'])) {
+            $untilDate      = $params['untilDate'];
+        }
+        $untilNumber    = $params['untilNumber'];
+
+        if (isset($params['timeStart']) && !empty($params['timeStart'])) {
+            $dateStartSave .= ' ' . $params['timeStart'] . ':00';
+        } else {
+            $dateStartSave .= ' 00:00:00';
+        }
+        if (isset($params['timeEnd']) && !empty($params['timeEnd'])) {
+            $dateEndSave .= ' ' . $params['timeEnd'] . ':00';
+        } else {
+            $dateStartSave .= ' 00:00:00';
+        }
+
+        $task->setDateStart($dateStartSave);
+        $task->setDateEnd($dateEndSave);
+        $task->setDateStartOrigine($dateStartSave);
+        $task->setDateEndOrigine($dateEndSave);
+        $task->reiterate    = $repeat;
+        $task->interspace   = $interspace;
+        $task->reiterateEnd = $reiterateEnd;
+        if (isset($untilDate)) {
+            $task->untilDate    = $untilDate;
+        }
+        $task->untilNumber  = $untilNumber;
+        $task->name    = $task_name;
+        $task->priority     = $priority;
+        $task->idProject    = $project_id;
+        return $task->save();
     }
 
 }

@@ -15,10 +15,6 @@ class Router
         try
         {
             $routeFound = $this->_getSimpleRoute();
-
-            if (!$routeFound) {
-                $routeFound = $this->_getParameterRoute();
-            }
             
             if ($routeFound === false)
             {

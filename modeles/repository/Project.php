@@ -1,23 +1,11 @@
 <?php
 
-class ORM_Project extends Model
+class Repository_Project
 {
-
-    protected $bdd_name  = 'project';
-    protected $attributs = array(
-        'id'        => 'id',
-        'name'      => 'name',
-        'created'   => 'created',
-        'updated'   => 'updated'
-    );
-    protected $primary_key = 'id';
-    protected $foreign_keys = array(
-        'tasks' => array('task','id','idProject')
-    );
     
-    function __toString()
+    public function load()
     {
-        return $this->name;
+        return Project::factory('project')->load(false);
     }
     
     function getTasks()

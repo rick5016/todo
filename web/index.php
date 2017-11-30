@@ -16,42 +16,50 @@ session_start();
 // includes the system routes. Define your own routes in this file
 include(ROOT_PATH . '/config/routes.php');
 
+require_once ROOT_PATH . '/library/twig/Autoloader.php';
+require_once ROOT_PATH . '/form/Autoloader.php';
+require_once ROOT_PATH . '/modeles/Autoloader.php';
+
 function autoloader($className)
 {
     $modules = array('common', 'front');
-    if ($className == 'Twig_Autoloader') // Autoloader de Twig
+    if (strlen($className) > 10 && substr($className, -10) == 'Controller') // Controller
     {
-        require_once ROOT_PATH . '/library/twig/Autoloader.php';
+        $ctrl = array_reverse(explode('_', $className));
+        foreach ($modules as $module)
+        {
+            if (file_exists(ROOT_PATH . '/modules/' . $module . '/ctrl/' . $ctrl[0] . '.php')) {
+                require_once ROOT_PATH . '/modules/' . $module . '/ctrl/' . $ctrl[0] . '.php';
+            }
+        }
     }
-    elseif (substr($className, 0, 4) != 'Twig') // Autoloader Non Twig
+    elseif (substr($className, 0, 5) == 'Form_') // Formulaire
     {
-        if (strlen($className) > 10 && substr($className, -10) == 'Controller') // Controller
+        $form = array_reverse(explode('_', $className));
+        if (file_exists(ROOT_PATH . '/library/form/' . $module . '/form/' . $form[0] . '.php')) {
+            require_once ROOT_PATH . '/library/form/' . $module . '/form/' . $form[0] . '.php';
+        }
+        foreach ($modules as $module)
         {
-            $ctrl = array_reverse(explode('_', $className));
-            foreach ($modules as $module)
-            {
-                if (file_exists(ROOT_PATH . '/modules/' . $module . '/ctrl/' . $ctrl[0] . '.php')) {
-                    require_once ROOT_PATH . '/modules/' . $module . '/ctrl/' . $ctrl[0] . '.php';
-                }
+            if (file_exists(ROOT_PATH . '/modules/' . $module . '/form/' . $form[0] . '.php')) {
+                require_once ROOT_PATH . '/modules/' . $module . '/form/' . $form[0] . '.php';
             }
         }
-        elseif (substr($className, 0, 4) == 'Form' || $className == 'form')
+    }
+    if (substr($className, 0, 6) == 'Plugin') // Plugin twig
+    {
+        $plugin = array_reverse(explode('_', $className));
+        foreach ($modules as $module)
         {
-            $form = array_reverse(explode('_', $className));
-            foreach ($modules as $module)
-            {
-                if (file_exists(ROOT_PATH . '/modules/' . $module . '/form/' . $form[0] . '.php')) {
-                    require_once ROOT_PATH . '/modules/' . $module . '/form/' . $form[0] . '.php';
-                }
+            if (file_exists(ROOT_PATH . '/library/plugins/twig/' . $plugin[0] . '.php')) {
+                require_once ROOT_PATH . '/library/plugins/twig/' . $plugin[0] . '.php';
             }
         }
-        else
-        {
-            if (file_exists(ROOT_PATH . '/library/mvc/' . $className . '.php')) { // MVC
-                require_once ROOT_PATH . '/library/mvc/' . $className . '.php';
-            } else { // modeles
-                require_once ROOT_PATH . '/modeles/' . $className . '.php';
-            }
+    }
+    else // MVC
+    {
+        if (file_exists(ROOT_PATH . '/library/mvc/' . $className . '.php')) {
+            require_once ROOT_PATH . '/library/mvc/' . $className . '.php';
         }
     }
 }

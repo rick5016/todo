@@ -1,8 +1,11 @@
 <?php
 
-class Twigplugin
+class Plugin_Form
 {
-
+    function test($form, $elementName)
+    {
+        return 'testfsdfsd';
+    }
     
     function setDatePrev($date, $type)
     {

@@ -17,30 +17,64 @@ class Request
     {
         if ($this->isPost())
         {
-            if (isset($_POST[$key]))
-            {
+            if (isset($_POST[$key])) {
                 return $_POST[$key];
             }
         }
         else if ($this->_isGet())
         {
-            if (isset($_GET[$key]))
-            {
+            if (isset($_GET[$key])) {
                 return $_GET[$key];
             }
         }
 
         return $default;
     }
-
-    public function getAllParams()
+    
+    public function issetParam($key)
     {
         if ($this->isPost())
         {
-            return $_POST;
+            if (isset($_POST[$key])) {
+                return true;
+            }
         }
         else if ($this->_isGet())
         {
+            if (isset($_GET[$key])) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+    
+    public function emptyParam($key)
+    {
+        if ($this->issetParam($key))
+        {
+            if ($this->isPost())
+            {
+                if (empty($_POST[$key])) {
+                    return true;
+                }
+            }
+            else if ($this->_isGet())
+            {
+                if (empty($_GET[$key])) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    public function getParams()
+    {
+        if ($this->isPost()) {
+            return $_POST;
+        } else if ($this->_isGet()) {
             return $_GET;
         }
     }

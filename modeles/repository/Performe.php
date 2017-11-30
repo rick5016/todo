@@ -1,6 +1,6 @@
 <?php
 
-class ORM_Performe extends Model
+class Repository_Performe
 {
 
     protected $bdd_name  = 'performe';

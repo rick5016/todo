@@ -17,6 +17,7 @@ class BDD
      */
     function __construct($datas = array(), $foreign_keys = false, $className = '', $limit = 200)
     {
+        ORM_Autoloader::register();
         $this->dbh();
         $this->populate($datas, $foreign_keys, $className, $limit);
     }
@@ -225,9 +226,10 @@ class BDD
         }
     }
     
-    static function factory($table)
+    static function factory($name)
     {
-        return new $table();
+        $repository = 'Repository_' . $name;
+        return new $repository();
     }
     
     /**

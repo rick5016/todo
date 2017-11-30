@@ -5,11 +5,12 @@ class Controller
 
     public $view        = null;
     protected $_request = null;
-    public $parameters = array();
 
     public function init()
     {
         $this->view = new View();
+        Model::init();
+        Form::init();
     }
 
     public function execute($action = 'index', $module = 'common')
@@ -25,7 +26,7 @@ class Controller
             throw new Exception($action . 'Action n\'existe pas');
         }
         
-        echo $this->view->renderViewScript($module . '/views/' . $action . '.tpl', $this->parameters);
+        echo $this->view->renderViewScript($module . '/views/' . $action . '.tpl');
     }
 
     public function getRequest()
