@@ -26,6 +26,9 @@
                 bottom:0;
                 border-left: 1px dotted #ddd;
             }
+            .dropdown.open {
+                background: #fff;
+            }
         </style>
         <script type="text/javascript" src="https://code.jquery.com/jquery-1.12.4.js"></script>
         <script type="text/javascript" src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>

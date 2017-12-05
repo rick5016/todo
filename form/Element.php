@@ -62,6 +62,11 @@ class Form_Element
         return $this->name;
     }
     
+    function getValue()
+    {
+        return $this->value;
+    }
+    
     function getLibelle()
     {
         if (!empty($this->libelle)) {

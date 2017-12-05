@@ -13,20 +13,19 @@ class Front_IndexController extends Controller
         $task_id = $this->getRequest()->getParam('id');
         if (isset($task_id) && !empty($task_id)) {
             $task = Model::factory('task')->loadOne(true, array('task.id' => $task_id));
+        } else
+        {
+            $task = new ORM_Task();
+            $this->view->new  = true;
         }
         
-        $form = new Form_task(Model::factory('project')->load(false));
+        $form = new Form_task($task, Model::factory('project')->load(false));
         if ($this->getRequest()->isPost())
         {
-            if ($form->isValid($this->getRequest()->getParams())) {
-                if (!isset($task))
-                {
-                    $task = new ORM_Task();
-                    $new  = true;
-                }
-                $task                = ORM_Repository::factory('task')->saveTask($this->getRequest()->getParams(), $task);
-                $this->view->task_id = $task->id;
-                $this->view->valide = isset($new) ? 'Tache enregistrée (id = ' . $task->id . ')' : 'Tache modifiée (id = ' . $task->id . ')';
+            if ($form->isValid($this->getRequest()->getParams()))
+            {
+                $task             = ORM_Repository::factory('task')->saveTask($this->getRequest()->getParams(), $task);
+                $this->view->task = $task;
             }
         }
         $this->view->form         = $form;
@@ -35,39 +34,63 @@ class Front_IndexController extends Controller
     
     function inboxAction()
     {
-        $tri = array();
-        $clause = array();
-        $filtres = new Form_filtres();
-        if (isset($_GET['filtre']))
+        $tri      = array();
+        $clause   = array();
+        $form     = new Form_filtres();
+        if ($form->isValid($this->getRequest()->getParams()))
         {
-            if ($_GET['filtre'] == "today")
+            $filtre = $this->getRequest()->getParam('filtre');
+            if (isset($filtre))
             {
-                $vars['filtre_today'] = true;
-                $vars = $filtres->check(array('filtrer' => true), $vars, false);
+                $this->view->filtre = true;
+                if ($filtre == "project")
+                {
+//                    $idProject = $this->getRequest()->getParam('id');
+//                    $vars = $form->check($_POST, $vars);
+//                    $clause[] = "project.id = " . (int) $idProject;
+                }
             }
-            elseif ($_GET['filtre'] == "project")
+            if ($this->getRequest()->isPost())
             {
-                $vars = $filtres->check($_POST, $vars);
-                $clause[] = "project.id = " . (int) $_GET['id'];
+                foreach ($form->getElements() as $name => $element)
+                {
+                    if ($form->getElement($name)->isChecked()) {
+                        $_SESSION[$name] = true;
+                    }
+                    else
+                    {
+                        $form->getElement($name)->setChecked(false);
+                        unset($_SESSION[$name]);
+                    }
+                }
             }
-        } else {
-            $vars = $filtres->check($_POST, $vars);
+            else
+            {
+                foreach ($form->getElements() as $name => $element)
+                {
+                    if (isset($_SESSION[$name])) {
+                        $form->getElement($name)->setChecked(true);
+                    }
+                }
+            }
         }
 
-        $vars['priority'] = '11111';
-        if (isset($_GET['priority'])) {
-            $vars['priority'] = $_GET['priority'];
+        $priority = $this->getRequest()->getParam('priority');
+        if (!isset($priority)) {
+            $priority = '11111';
         }
-        $tasks = ORM_Repository::factory('task')->loadInbox($clause, $vars['priority']);
+        $this->view->priority = $priority;
+
+        $tasks = ORM_Repository::factory('task')->loadInbox($clause, $priority);
         foreach ($tasks as $task)
         {
             $afficher_la_tache = true;
 
             // Afficher ou non les dates après Aujourd'hui
-            if (!isset($vars['ant']) && $task->dateStart > date('Y-m-d H:i')) {
-                $afficher_la_tache = false;
-            }
-
+//            if (!isset($_SESSION['see_ant']) && $task->dateStart > date('Y-m-d H:i') && !isset($filtre)) {
+//                $afficher_la_tache = false;
+//            }
+            
             if ($afficher_la_tache)
             {
                 $date_affichage = $task->dateStart;
@@ -78,11 +101,11 @@ class Front_IndexController extends Controller
                     $date_affichage = date('Y-m-d H:i') . ':00';
                 }
                 $task->dateAffichage = $date_affichage;
-
+                
                 // Afficher ou non les dates avant aujourd'hui
-                if (!isset($vars['past']) && ($task->dateAffichage < date('Y-m-d H:i'))) {
-                    $afficher_la_tache = false;
-                }
+//                if (!isset($_SESSION['see_past']) && ($task->dateAffichage < date('Y-m-d')) && !isset($filtre)) {
+//                    $afficher_la_tache = false;
+//                }
 
                 if ($afficher_la_tache)
                 {
@@ -119,10 +142,11 @@ class Front_IndexController extends Controller
                 $return[] = $data;
             }
         }
-
-        $vars['tasks'] = $return;
-
-//        return $vars;
+        if (isset($_SESSION['see_details'])) {
+            $this->view->details = true;
+        }
+        $this->view->form = $form;
+        $this->view->tasks = $return;
     }
     
     function calendrierAction()
@@ -234,9 +258,17 @@ class Front_IndexController extends Controller
         }
         return $data;
     }
-    function delAction()
+    
+    function deleteAction()
     {
-        Model::factory('task')->delete(true, $_GET['id']); 
+        $id = $this->getRequest()->getParam('id');
+        
+        if (isset($id)) {
+            Model::factory('task')->delete(true, $id);
+        }
+        
+        header('Location: ' . $_SERVER['HTTP_REFERER']);
+        exit;
     }
 
     function doneAction()

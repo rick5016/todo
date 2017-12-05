@@ -14,9 +14,23 @@ class Element_Checkbox extends Form_Element
     {
         $this->checked = $checked;
     }
+
+    function isChecked()
+    {
+        return $this->checked;
+    }
+    
+    function getCheckedHTML()
+    {
+        if ($this->checked) {
+            return ' checked';
+        }
+        
+        return '';
+    }
     
     function getHTML()
     {
-        return '<input type="checkbox" id="' . $this->name . '" name="' . $this->name . '" value="1" />';
+        return '<input' . $this->getHTMLAttributs() . $this->getCheckedHTML() . ' type="checkbox" id="' . $this->name . '" name="' . $this->name . '" value="1" />';
     }
 }

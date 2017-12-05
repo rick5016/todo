@@ -1,20 +1,19 @@
 {% set jourMois = '' %}
 {% set today = true %}
 <div>
-    <a href="?page=inbox&priority={% if priority|slice(0, 1) == '1' %}{{ '0' ~ priority|slice(1, 4)}}{% else %}{{ '1' ~ priority|slice(1, 4)}}{% endif %}">
+    <a href="/inbox?priority={% if priority|slice(0, 1) == '1' %}{{ '0' ~ priority|slice(1, 4)}}{% else %}{{ '1' ~ priority|slice(1, 4)}}{% endif %}">
         <span{% if priority|slice(0, 1) == '1' %} class="btn btn-primary"{% else %} class="btn btn-default"{% endif %}>Défaut</span>
     </a>
-    <a href="?page=inbox&priority={% if priority|slice(1, 1) == '1' %}{{ priority|slice(0, 1) ~ '0' ~ priority|slice(2, 3)}}{% else %}{{ priority|slice(0, 1) ~ '1' ~ priority|slice(2, 3)}}{% endif %}">
+    <a href="/inbox?priority={% if priority|slice(1, 1) == '1' %}{{ priority|slice(0, 1) ~ '0' ~ priority|slice(2, 3)}}{% else %}{{ priority|slice(0, 1) ~ '1' ~ priority|slice(2, 3)}}{% endif %}">
         <span{% if priority|slice(1, 1) == '1' %} class="btn btn-danger"{% else %} class="btn btn-default"{% endif %}>Priorité 1</span>
     </a>
-    <a href="?page=inbox&priority={% if priority|slice(2, 1) == '1' %}{{ priority|slice(0, 2) ~ '0' ~ priority|slice(3, 2)}}{% else %}{{ priority|slice(0, 2) ~ '1' ~ priority|slice(3, 2)}}{% endif %}">
+    <a href="/inbox?priority={% if priority|slice(2, 1) == '1' %}{{ priority|slice(0, 2) ~ '0' ~ priority|slice(3, 2)}}{% else %}{{ priority|slice(0, 2) ~ '1' ~ priority|slice(3, 2)}}{% endif %}">
         <span{% if priority|slice(2, 1) == '1' %} class="btn btn-warning"{% else %} class="btn btn-default"{% endif %}>Priorité 2</span>
     </a>
-    <a href="?page=inbox&priority={% if priority|slice(3, 1) == '1' %}{{ priority|slice(0, 3) ~ '0' ~ priority|slice(4, 1)}}{% else %}{{ priority|slice(0, 3) ~ '1' ~ priority|slice(4, 1)}}{% endif %}">
+    <a href="/inbox?priority={% if priority|slice(3, 1) == '1' %}{{ priority|slice(0, 3) ~ '0' ~ priority|slice(4, 1)}}{% else %}{{ priority|slice(0, 3) ~ '1' ~ priority|slice(4, 1)}}{% endif %}">
         <span{% if priority|slice(3, 1) == '1' %} class="btn btn-primary" style="background-color:#e8dc00;border-color:#e8dc00"{% else %} class="btn btn-default"{% endif %}>Priorité 3</span>
     </a>
 </div>
-{% if filtre_today is not defined %}
     <script>
       $(function() {
         $('#past').change(function() {
@@ -29,24 +28,25 @@
       })
     </script>
     <form method="post" id="filtrer">
+        {% if filtre_today is not defined %}
+            <div>
+                <label class="checkbox-inline" value="">
+                    {{ form.get('past').get()|raw }} Tâches non accomplies dans le passé
+                </label>
+            </div>
+            <div>
+                <label class="checkbox-inline" value="">
+                    {{ form.get('ant').get()|raw }} Prochaines Tâches
+                </label>
+            </div>
+        {% endif %}
         <div>
             <label class="checkbox-inline" value="">
-                <input data-toggle="toggle" {% if past is defined %}checked{% endif %} type="checkbox" name="past" id="past" /> Tâches non accomplies dans le passé
-            </label>
-        </div>
-        <div>
-        <label class="checkbox-inline" value="">
-            <input data-toggle="toggle" {% if ant is defined %}checked{% endif %} type="checkbox" name="ant" id="ant" /> Prochaines Tâches
-        </label>
-        </div>
-        <div>
-            <label class="checkbox-inline" value="">
-                <input data-toggle="toggle" {% if details is defined %}checked{% endif %} type="checkbox" name="details" id="details" /> Afficher les détails
+                {{ form.get('details').get()|raw }} Afficher les détails
             </label>
         </div>
         <input type="hidden" value="Filtrer" name="filtrer" />
     </form>
-{% endif %}
 <hr style="border-bottom: 1px solid #F5F5F5;" />
 {% if projects is empty %}
 <ul>
@@ -113,7 +113,7 @@
             
             {% if today and task.dateStart|date('Y-m-d H:i', timezone="Europe/Paris") < "now"|date('Y-m-d H:i', timezone="Europe/Paris") %} <!-- Aujourd'hui : Lien glyphicon valider -->
                 <div style="float:left;height:100%;padding:0 7px 0 0;">
-                    <a title="valider" href="index.php?page=done&id={{ task.id }}">
+                    <a title="valider" href="/done?id={{ task.id }}">
                         <span title="valider" class="glyphicon glyphicon-ok-circle" style="font-size: 35px;vertical-align:-38%;"></span>
                         <span title="valider" >
                             <b>{{ task.name }}</b> 
@@ -126,7 +126,7 @@
                 {% if today == false and performes|length > 0 %} <!-- Demain : lien glyphicon annuler -->
                     {% set performe = performes.0 %}
                     <div style="float:left;height:100%;padding:0 7px 0 0;">
-                        <a href="index.php?page=cancel&id={{ task.id }}&idPerforme={{ performe.id }}">
+                        <a href="/cancel?id={{ task.id }}&idPerforme={{ performe.id }}">
                             <span title="Annuler" class="glyphicon glyphicon-remove-circle" style="font-size: 25px;vertical-align:-22%;"></span>
                         </a>
                         <span style="color:#8f8f8f">
@@ -145,7 +145,7 @@
             {% endif %}
                 
             <div style="float:left;height:100%;padding-top: 6px;padding-left: 0;">
-                <a href="index.php?page=task&id={{ task.id }}"><span title="modifier" class="glyphicon glyphicon-edit"></span></a> <a title="supprimer" href="index.php?page=del&id={{ task.id }}"><span class="glyphicon glyphicon-remove"></span></a>
+                <a href="/task?id={{ task.id }}"><span title="modifier" class="glyphicon glyphicon-edit"></span></a> <a title="supprimer" href="/delete?id={{ task.id }}"><span class="glyphicon glyphicon-remove"></span></a>
             </div>
                 
             {% if details is defined %}

@@ -1,5 +1,7 @@
-{% if valide is defined %}
-    <h2 style="color: green;font-weight: bold;">{{ valide }}</h2>
+{% if new is defined and task is defined %}
+    <h2 style="color: green;font-weight: bold;">Tache enregistrée ({{ task.id }})</h2>
+{% elseif (task is defined) %}
+    <h2 style="color: green;font-weight: bold;">Tache modifiée ({{ task.id }})</h2>
 {% endif %}
 
 {% if form.hasErrors() %}
@@ -9,9 +11,15 @@
         {% endfor %}
     </ul>
 {% endif %}
-<h3>Ajouter une tâche</h3>
+{% if task is defined %}
+    <h3>Modifier la tache <b>{{ task.name }}</b></h3>
+{% else %}
+    <h3>Ajouter une tâche</h3>
+{% endif %}
 <form method="post">
-    <input name="id" type="hidden" value="{{ task_id }}" />
+    {% if task is defined %}
+        <input name="id" type="hidden" value="{{ task.id }}" />
+    {% endif %}
     {{ form.get('task_name')|raw }}
     {{ form.get('project_id')|raw }}
     {{ form.get('priority')|raw }}

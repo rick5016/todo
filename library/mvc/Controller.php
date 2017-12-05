@@ -15,7 +15,6 @@ class Controller
 
     public function execute($action = 'index', $module = 'common')
     {
-
         $this->init();
         if (method_exists($this, $action . 'Action'))
         {

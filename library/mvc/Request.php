@@ -15,17 +15,12 @@ class Request
 
     public function getParam($key, $default = null)
     {
-        if ($this->isPost())
-        {
-            if (isset($_POST[$key])) {
-                return $_POST[$key];
-            }
+        if (isset($_GET[$key])) {
+            return $_GET[$key];
         }
-        else if ($this->_isGet())
-        {
-            if (isset($_GET[$key])) {
-                return $_GET[$key];
-            }
+
+        if (isset($_POST[$key])) {
+            return $_POST[$key];
         }
 
         return $default;

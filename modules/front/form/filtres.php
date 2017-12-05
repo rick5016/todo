@@ -1,17 +1,27 @@
 <?php
-//include_once('modules/common/form/form.php');
+
 class Form_filtres extends form
 {
-   
+    
     function __construct()
     {
-        $this->add('checkbox', 'past');
-        $this->add('checkbox', 'end');
-        $this->add('checkbox', 'ant');
+        $this->add($past = new Element_Checkbox('date_passee'));
+        $past->setAttributs(array('data-toggle' => 'toggle', 'data-onstyle' => 'danger', 'data-on' => 'Off', 'data-off' => 'On'));
+        
+        $this->add($details = new Element_Checkbox('details'));
+        $details->setAttributs(array('data-toggle' => 'toggle', 'data-onstyle' => 'danger'));
+        
+        $this->add($ant = new Element_Checkbox('date_anterieure'));
+        $ant->setAttributs(array('data-toggle' => 'toggle', 'data-onstyle' => 'danger'));
     }
     
     function check($datas, $vars, $save = true)
     {
+        $past = $this->getElement('past');
+        $end  = $this->getElement('end');
+        $ant  = $this->getElement('ant');
+        $filtrer  = $this->getElement('filtrer');
+        
         // Voir les tâches avant
         if (isset($datas['past']) && isset($datas['filtrer']))
         {

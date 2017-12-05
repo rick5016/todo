@@ -190,6 +190,16 @@ class Repository_Task extends ORM_Task
                 $query = substr($query, 0, -1);
                 $query .= ')';
             }
+            
+            if (isset($_SESSION['date_anterieure']))
+            {
+                $query .= ' and date(dateStart) <= date(now())';
+            }
+            if (isset($_SESSION['date_passee']))
+            {
+                $query .= ' and (date(dateStart) >= date(now()) or date(dateEnd) >= date(now()))';
+            }
+            
             $query .= ' order by dateStart, priority, performe_id desc';
 
             $stmt  = $this->dbh->query($query);
@@ -346,7 +356,7 @@ class Repository_Task extends ORM_Task
         $timeStart      = $params['timeStart'];
         $timeEnd        = $params['timeEnd'];
         $repeat         = $params['repeat'];
-        $interspace     = $params['interspace'];
+        $interspace     = empty($params['interspace']) ? null : $params['interspace'];
         $reiterateEnd   = $params['reiterateEnd'];
         if (!empty($params['untilDate'])) {
             $untilDate      = $params['untilDate'];

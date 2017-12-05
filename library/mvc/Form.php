@@ -21,6 +21,11 @@ class Form
         return $this->elements[$name];
     }
 
+    public function getElements()
+    {
+        return $this->elements;
+    }
+
     function add($element)
     {
         $this->addElement($element);
@@ -35,9 +40,15 @@ class Form
     {
         foreach ($this->elements as $element)
         {
-            if (isset($params[$element->getName()])) {
+            if (isset($params[$element->getName()]))
+            {
+                if ($element instanceof Element_Checkbox && $params[$element->getName()] == '1') {
+                    $element->setChecked(true);
+                }
+                
                 $element->setValue($params[$element->getName()]);
             }
+            
             if (!$element->isValid()) {
                 $this->errors[] = $element->error;
             }
