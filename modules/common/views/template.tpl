@@ -38,7 +38,7 @@
     <body>
         <div class="box" style="padding:0;margin:0;">
             <div class="floated menu" style="height:100%;background-color:#F5F5F5">
-                <div style="border: 1px black dotted;text-align:center;margin-right:20px;margin-bottom: 20px;">{{ "now"|date('d/m/Y H:i', timezone="Europe/Paris") }}</div>
+                <div id="display_date" style="border: 1px black dotted;text-align:center;margin-right:20px;margin-bottom: 20px;">{{ "now"|date('d/m/Y H:i', timezone="Europe/Paris") }}</div>
                 <ul style="list-style-type:none;">
                     <li><a href="/inbox?filtre=today"><span title="boîte de réception" class="glyphicon glyphicon-calendar"></span> Aujourd'hui</a></li>
                     <li><a href="/task"><span title="ajouter" class="glyphicon glyphicon-plus"></span> Ajouter une tâche</a></li>
@@ -57,29 +57,21 @@
             <div class="sep"></div>
             <div class="floated content">
                 {{ content|raw }} <br />
-                
-                
-                
-                
-                {% if page is not defined %}
-                    Acceuil
-                {% elseif page == 'del' and id != null %}
-                    <script>window.location="index.php?page=inbox";</script>
-                {% elseif page == 'done' and id != null %}
-                    <script>window.location="index.php?page=inbox";</script>
-                {% elseif page == 'cancel' %}
-                    <script>window.location="index.php?page=inbox";</script>
-                {% elseif page == 'inbox' %}
-                    {% include('/front/views/inbox.tpl') %}
-                {% elseif page == 'cal' %}
-                    {% include('/front/views/cal.tpl') %}
-                {% elseif page == 'today' %}
-                    {% include('/front/views/today.tpl') %}
-                {% elseif page == 'task' %}
-                    {% include('/front/views/task.tpl') %}
-                {% endif %}
             </div>
             <div class="clearfix"></div>
         </div>
+            
+<script>
+    $(function() {
+        display_date();
+    });
+
+    function display_date()
+    {
+        date = new Date;
+        $('#display_date').html(date.getDay() + '/' + date.getMonth() + '/' + date.getFullYear() + ' ' + date.getHours() + ':' + date.getMinutes());
+        setTimeout('display_date();', '1000');
+    }
+</script>
     </body>
 </html>

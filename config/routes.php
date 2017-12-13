@@ -6,10 +6,10 @@
 // Défault : '/' => 'ctrl#action' (module 'common' par défaut)
 $routes = array(
     '/'           => '',
-    '/task'       => 'front/index#task',
-    '/inbox'      => 'front/index#inbox',
-    '/calendrier' => 'front/index#calendrier',
-    '/delete'     => 'front/index#delete',
-    '/done'       => 'front/index#done',
-    '/cancel'     => 'front/index#cancel',
+    '/task'       => 'front/inbox#task',
+    '/inbox'      => 'front/inbox#index',
+    '/calendrier' => 'front/calendrier#index',
+    '/delete'     => 'front/inbox#delete',
+    '/performe'   => 'front/inbox#performe',
+    '/cancel'     => 'front/inbox#cancel',
 );

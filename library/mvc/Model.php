@@ -350,6 +350,9 @@ class Model
             if (isset($arrayDateTime[1])){
                 return $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . ' ' . $arrayDateTime[1];
             }
+            else {
+                return $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0];
+            }
         }
         return $date;
     }

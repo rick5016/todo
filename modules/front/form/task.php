@@ -45,7 +45,7 @@ class Form_task extends form
         if (isset($task->id))
         {
             $dateStart_dateTime = new DateTime($task->getDateStart());
-            $dateEnd_dateTime   = new DateTime($task->getDateFin());
+            $dateEnd_dateTime   = new DateTime($task->getDateEnd());
             $dateStartValue     = $dateStart_dateTime->format('d/m/Y');
             $dateEndValue       = $dateEnd_dateTime->format('d/m/Y');
             $timeStartValue     = $dateStart_dateTime->format('H:i');

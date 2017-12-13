@@ -27,6 +27,73 @@ class ORM_Task extends Model
         'performes' => array('performe','id', 'idTask')
     );
     
+    /**
+     * Si la date d'aujoud'hui ce situe entre le début et la fin de l'événement alors la date d'affiche est la date d'aujourd'hui
+     * Si la date de fin est passé et que retierate <> de 0 alors la date d'affiche est la date d'aujourd'hui
+     */
+    function setDateAffichage()
+    {
+        $this->dateAffichage = $this->dateStart;
+
+        if (($this->dateStart < date('Y-m-d H:i') && $this->dateEnd >  date('Y-m-d H:i')) || ($this->dateEnd <  date('Y-m-d H:i') && $this->reiterate != 0)) {
+            $this->dateAffichage = date('Y-m-d H:i:s');
+        }
+    }
+    
+    /**
+     * TODO : A revoir
+     */
+    function setMoment()
+    {
+        $dateStart_dateTime = new DateTime($this->dateStart);
+        $dateEnd_dateTime   = new DateTime($this->dateEnd);
+        $timeStart          = $dateStart_dateTime->format('H:i');
+        $timeEnd            = $dateEnd_dateTime->format('H:i');
+
+        $this->moment = 3; // Toute la journée
+        if ($timeStart != "00:00" || $timeEnd != "00:00")
+        {
+            if ($timeStart == "00:00" and $timeEnd == "11:59") {
+                $this->moment = 1; // Matin
+            } elseif ($timeStart == "12:00" && ($timeEnd == "17:59" || $timeEnd == "23:59")) {
+                $this->moment = 2; // Après-midi et soir
+            } elseif ($timeStart == "18:00" and $timeEnd == "23:59") {
+                $this->moment = 4; // soir
+            }
+        }
+    }
+    
+    /**
+     * Compte le nombre de fois que la tâche a été effectuée
+     * 
+     * @return int $result
+     */
+    function count()
+    {
+        if ($this->reiterate == 0) {
+            return false;
+        }
+        
+        $result = 0;
+        try {
+            $query = "select count(*) as nbPerforme from performe where idTask = " . $this->id;
+
+            $stmt  = $this->dbh->query($query);
+            if ($stmt)
+            {
+                while($data = $stmt->fetch()) {
+                    $result = $data['nbPerforme'];
+                }  
+            }
+        }
+        catch (PDOException $e) {
+            var_dump($e->getMessage().' At line '.$e->getLine());
+            exit;
+        }
+        return $result;
+    }
+    
+    /*
     function setDateStart($dateStart)
     {
         if (strpos($dateStart, '/'))
@@ -124,28 +191,7 @@ class ORM_Task extends Model
         }
         
         return null;
-    }
-    
-    function count()
-    {
-        $result = 0;
-        try {
-            $query = "select count(*) as nbPerforme from performe where idTask = " . $this->id;
-
-            $stmt  = $this->dbh->query($query);
-            if ($stmt)
-            {
-                while($data = $stmt->fetch()) {
-                    $result = $data['nbPerforme'];
-                }  
-            }
-        }
-        catch (PDOException $e) {
-            var_dump($e->getMessage().' At line '.$e->getLine());
-            exit;
-        }
-        return $result;
-    }
+    }*/
     
     function performe()
     {
@@ -169,21 +215,21 @@ class ORM_Task extends Model
                     $dateTimeStart  = new DateTime($this->dateStart);
                     $dateTimeEnd  = new DateTime($this->dateEnd);
                     
-                    // Calcul de l'interval
+                    // Calcul de l'interval pour la nouvelle date de fin
                     $diff = $dateTimeStart->diff($dateTimeEnd);
                     $interval = $diff->format('%a');
                     
-                    // Calcul de la date de début
+                    // Calcul de la nouvelle date de début
                     $newDateTimeStart = new DateTime($this->getNewDate($this->dateStart, $this->reiterate, $this->interspace));
-                    $this->setDateStart($newDateTimeStart->format('Y-m-d H:i'));
+                    $this->setDateStart($newDateTimeStart->format('Y-m-d H:i:s'));
                     
                     // Calcul de la date de fin
                     $newDateTimeStart->add(new DateInterval('P' . $interval . 'D'));
-                    $this->setDateEnd($newDateTimeStart->format('Y-m-d') . ' ' . $dateTimeEnd->format('H:i'));
+                    $this->setDateEnd($newDateTimeStart->format('Y-m-d') . ' ' . $dateTimeEnd->format('H:i:s'));
 
                     parent::save();
                 }
-                $performe = new Performe(array('idTask' => $this->id));
+                $performe = new ORM_Performe(array('idTask' => $this->id));
                 $performe->save(); 
                 
                 $this->dbh->commit();
@@ -218,7 +264,7 @@ class ORM_Task extends Model
         {
             $lastDate = $date;
             
-            // TODO : la date de début d'une ité"ration au mois doit avoir le même jour que la date d'origine, sinon, on passe au mois suivant
+            // TODO : la date de début d'une itération au mois doit avoir le même jour que la date d'origine, sinon, on passe au mois suivant
             $dateTime = new DateTime($date);
             $reiterate_type = 'D';
             if ($reiterate == 2) { // Semaine
@@ -235,13 +281,13 @@ class ORM_Task extends Model
         }
             
         if ($search == 'next') {
-            return $date . ' '. $dateTimeOrigine->format('H:i') . ':00';
+            return $date . ' '. $dateTimeOrigine->format('H:i:s');
         } else {
-            return $lastDate . ' ' . $dateTimeOrigine->format('H:i') . ':00';
+            return $lastDate . ' ' . $dateTimeOrigine->format('H:i:s');
         }
     }
     
-    function deleteLastPerforme($id, $idPerforme)
+    /*function deleteLastPerforme($id, $idPerforme)
     {
         try {
             if ($this->dbh->beginTransaction())
@@ -273,6 +319,6 @@ class ORM_Task extends Model
             var_dump($e->getMessage().' At line '.$e->getLine());
             exit;
         }
-    }
+    }*/
 
 }

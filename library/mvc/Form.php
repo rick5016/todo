@@ -36,8 +36,12 @@ class Form
         $this->elements[$element->getName()] = $element;
     }
 
-    function isValid(array $params)
+    function isValid($params)
     {
+        if (!is_array($params)) {
+            // Exception
+        }
+            
         foreach ($this->elements as $element)
         {
             if (isset($params[$element->getName()]))

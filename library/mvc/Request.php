@@ -73,5 +73,10 @@ class Request
             return $_GET;
         }
     }
+    
+    public function getReferer()
+    {
+        return $_SERVER['HTTP_REFERER'];
+    }
 
 }
