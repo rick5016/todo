@@ -5,17 +5,15 @@ class Controller
 
     public $view        = null;
     protected $_request = null;
+    public $uri;
 
-    public function init()
+    public function __construct($ajax = false)
     {
-        $this->view = new View();
-        Model::init();
-        Form::init();
+        $this->view = new View($ajax);
     }
 
-    public function execute($action = 'index', $module = 'common')
+    public function execute($action = 'index')
     {
-        $this->init();
         if (method_exists($this, $action . 'Action'))
         {
             $this->{$action . 'Action'}();
@@ -24,8 +22,25 @@ class Controller
         {
             throw new Exception($action . 'Action n\'existe pas');
         }
-        
-        echo $this->view->renderViewScript($module . '/views/' . $action . '.tpl');
+    }
+    
+    public function renderViewScript($action = 'index', $ctrl = 'index', $module = 'common')
+    {
+        if (file_exists(ROOT_PATH . '/modules/' . $module . '/views/' . $ctrl . '#' . $action . '.tpl')) {
+            echo $this->view->renderViewScript($module . '/views/' . $ctrl . '#' . $action . '.tpl');
+        } else {
+            echo $this->view->renderViewScript($module . '/views/' . $action . '.tpl');
+        } 
+    }
+    
+    public function renderViewScriptAjax($action = 'index', $ctrl = 'index', $module = 'common')
+    {
+        if (file_exists(ROOT_PATH . '/modules/' . $module . '/views/' . $ctrl . '#' . $action . '.tpl')) {
+            $this->view->view = $this->view->twig->load($module . '/views/' . $ctrl . '#' . $action . '.tpl');
+        } else {
+            $this->view->view = $this->view->twig->load($module . '/views/' . $action . '.tpl');
+        }
+        echo $this->view->renderViewScriptAjax();
     }
 
     public function getRequest()
@@ -35,32 +50,6 @@ class Controller
         }
 
         return $this->_request;
-    }
-
-    protected function _getParam($key, $default = null)
-    {
-        // tests against the named parameters first
-        if (isset($this->_namedParameters[$key]))
-        {
-            return $this->_namedParameters[$key];
-        }
-
-        // tests against the GET/POST parameters
-        return $this->getRequest()->getParam($key, $default);
-    }
-
-    /**
-     * Fetches all the current parameters
-     * @return array a list of all the parameters
-     */
-    protected function _getAllParams()
-    {
-        return array_merge($this->getRequest()->getAllParams(), $this->_namedParameters);
-    }
-
-    public function addNamedParameter($key, $value)
-    {
-        $this->_namedParameters[$key] = $value;
     }
 
 }

@@ -17,7 +17,7 @@ class Element_Select extends Form_Element
     
     function getHTML()
     {
-        $html = '<select id="' . $this->name . '" name="' . $this->name . '"' . $this->getHTMLStyle() . ' />';
+        $html = '<select id="' . $this->name . '" name="' . $this->name . '"' . $this->getHTMLStyle() . ' >';
         $html .= $this->getOptionsHTML();
         $html .= '</select>';
         

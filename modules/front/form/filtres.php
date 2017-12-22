@@ -17,16 +17,6 @@ class Form_filtres extends form
     
     function isValid($request)
     {
-        $filtre = $request->getParam('filtre');
-        if (isset($filtre))
-        {
-            if ($filtre == "project")
-            {
-//                $idProject = $this->getRequest()->getParam('id');
-//                $vars = $form->check($_POST, $vars);
-//                $clause[] = "project.id = " . (int) $idProject;
-            }
-        }
         $valid = parent::isValid($request->getParams());
         if ($valid)
         {

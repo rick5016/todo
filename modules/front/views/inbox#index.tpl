@@ -13,7 +13,6 @@
         <span{% if priority|slice(3, 1) == '1' %} class="btn btn-primary" style="background-color:#e8dc00;border-color:#e8dc00"{% else %} class="btn btn-default"{% endif %}>Priorité 3</span>
     </a>
 </div>
-    
 <!--------------------------------- FORMULAIRE -------------------------------->
 <script>
   $(function() {
@@ -112,7 +111,7 @@
     {% endif %}
     
     <ul>
-        <div title="Priorité {{ task.priority }}" style="float:right;background:{{ priorityColor }};margin-right: 13px;margin-top: 13px;border-radius:50%;width:15px;height:15px;"></div>
+        <div title="Priorité {{ task.priority }}" style="float:right;background:{{ task.project.0.color }};margin-right: 13px;margin-top: 13px;border-radius:50%;width:15px;height:15px;"></div>
         {% if task.nbPerforme != false %}
             <div style="float:right;margin-top: 4px;">{{ task.nbPerforme }} fois</div>
         {% endif %}

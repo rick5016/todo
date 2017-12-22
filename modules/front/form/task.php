@@ -11,7 +11,7 @@ class Form_task extends form
         $name->setGlyphicon('glyphicon-tasks');
         $name->setValue($task->getName());
         
-        $this->add($project = new Element_Select('project_id'));
+        $this->add($project = new Element_Select('project'));
         $project->setLibelle('Projet');
         
         $projects = array();
@@ -20,10 +20,13 @@ class Form_task extends form
             $projects[$projectObj->getId()] = $projectObj->getName();
         }
         
-        $project->setOptions($projects);
+        $project->setOptions(array('' => 'Ajouter un nouveau projet') + $projects);
         $project->setStyle(array('margin-left' => '25px'));
         $project->setGlyphicon('glyphicon-calendar');
         $project->setValue($task->getIdProject());
+        
+        $this->add($name_new = new Element_Text('project_new'));
+        $name_new->setStyle(array('display' => 'none'));
         
         $this->add($priority = new Element_Radio('priority'));
         $priority->setValues(array('0', '1', '2', '3'));

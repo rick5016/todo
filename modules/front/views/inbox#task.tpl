@@ -1,7 +1,11 @@
-{% if new is defined and task is defined %}
-    <h2 style="color: green;font-weight: bold;">Tache enregistrée ({{ task.id }})</h2>
-{% elseif (task is defined) %}
-    <h2 style="color: green;font-weight: bold;">Tache modifiée ({{ task.id }})</h2>
+{% if validation is defined %}
+    <ul>
+        {% if new is defined %}
+            <li style="color: green;font-weight: bold;">Tâche enregistrée ({{ task.id }})</li>
+        {% elseif modification is defined %}
+            <li style="color: green;font-weight: bold;">Tâche modifiée ({{ task.id }})</li>
+        {% endif %}
+    </ul>
 {% endif %}
 
 {% if form.hasErrors() %}
@@ -11,17 +15,26 @@
         {% endfor %}
     </ul>
 {% endif %}
-{% if task is defined %}
-    <h3>Modifier la tache <b>{{ task.name }}</b></h3>
+
+{% if modification is defined %}
+    <h3>Modifier la tâche <b>{{ task.name }}</b></h3>
 {% else %}
     <h3>Ajouter une tâche</h3>
 {% endif %}
+
 <form method="post">
-    {% if task is defined %}
+    {% if modification is defined %}
         <input name="id" type="hidden" value="{{ task.id }}" />
     {% endif %}
     {{ form.get('task_name')|raw }}
-    {{ form.get('project_id')|raw }}
+    <div>
+        <p>
+            {{ form.get('project').getHTMLGlyphicon()|raw }}
+            <span>{{ form.get('project').getLibelle() }}</span>
+        </p>
+        {{ form.get('project').get()|raw }}
+        {{ form.get('project_new').get()|raw }}
+    </div>
     {{ form.get('priority')|raw }}
     <div>
         <span title="date" class="glyphicon glyphicon-time" style="margin-right:10px;"></span>
@@ -135,6 +148,16 @@
                 $('#timeStart, #timeEnd').show();
             }
         }
+        function newProject(project)
+        {
+            if (project === '') {
+                $("#project_new").show();
+            } else {
+                $("#project_new").hide();
+            }
+                
+        }
+        
         //--------------------------------------------------------------
         repeat($("#repeat").val());
         $("#repeat").change(function () {
@@ -149,6 +172,11 @@
         allDay($("#allDay").is(':checked'));
         $("#allDay").click(function () {
             allDay($(this).is(':checked'));
+        });
+        //-------------------------------------------------------------
+        newProject($("#project").val());
+        $("#project").change(function () {
+            newProject($(this).val());
         });
         //-------------------------------------------------------------
     });

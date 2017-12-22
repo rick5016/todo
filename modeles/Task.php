@@ -13,7 +13,7 @@ class ORM_Task extends Model
         'dateEnd'               => 'dateEnd',
         'dateStartOrigine'      => 'dateStartOrigine',
         'dateEndOrigine'        => 'dateEndOrigine',
-        'reiterate'             => 'reiterate', // Tous les
+        'reiterate'             => 'reiterate', // Tous les 0 : non, 1 : jour, 2 : semaine, 3 : mois, 4 : année
         'interspace'            => 'interspace', // intervalle entre les itérations
         'reiterateEnd'          => 'reiterateEnd', // Jusqu'à (toujours/custom)
         'untilDate'             => 'untilDate', // Jusqu'à une date
@@ -26,6 +26,26 @@ class ORM_Task extends Model
         'project' => array('project','idProject', 'id'),
         'performes' => array('performe','id', 'idTask')
     );
+    
+    function getReiterateLetter()
+    {
+        if ($this->reiterate == 3) {
+            return 'M';
+        } elseif ($this->reiterate == 4) {
+            return 'Y';
+        }
+        
+        return 'D';
+    }
+    
+    function getInterspace()
+    {
+        if ($this->reiterate == 2) {
+            return $this->interspace*7;
+        }
+        
+        return $this->interspace;
+    }
     
     /**
      * Si la date d'aujoud'hui ce situe entre le début et la fin de l'événement alors la date d'affiche est la date d'aujourd'hui
@@ -68,13 +88,13 @@ class ORM_Task extends Model
      * 
      * @return int $result
      */
-    function count()
+    function setNbPerforme()
     {
         if ($this->reiterate == 0) {
-            return false;
+            $this->nbPerforme = false;
         }
         
-        $result = 0;
+        $this->nbPerforme = 0;
         try {
             $query = "select count(*) as nbPerforme from performe where idTask = " . $this->id;
 
@@ -82,7 +102,7 @@ class ORM_Task extends Model
             if ($stmt)
             {
                 while($data = $stmt->fetch()) {
-                    $result = $data['nbPerforme'];
+                    $this->nbPerforme = $data['nbPerforme'];
                 }  
             }
         }
@@ -90,7 +110,6 @@ class ORM_Task extends Model
             var_dump($e->getMessage().' At line '.$e->getLine());
             exit;
         }
-        return $result;
     }
     
     /*
@@ -286,39 +305,5 @@ class ORM_Task extends Model
             return $lastDate . ' ' . $dateTimeOrigine->format('H:i:s');
         }
     }
-    
-    /*function deleteLastPerforme($id, $idPerforme)
-    {
-        try {
-            if ($this->dbh->beginTransaction())
-            {
-                $task = Model::factory("task")->loadOne(false, array('id' => $id));
-                $dateTimeStart  = new DateTime($task->dateStart);
-                $dateTimeEnd  = new DateTime($task->dateEnd);
-
-                // Calcul de l'interval
-                $diff = $dateTimeStart->diff($dateTimeEnd);
-                $interval = $diff->format('%a');
-                
-                // Calcul de la date de début
-                // TODO : gestion des semaines/mois/annees
-                $dateTimeStart->sub(new DateInterval('P' . $task->interspace . 'D'));
-                $task->setDateStart($dateTimeStart->format('Y-m-d H:i'));
-
-                // Calcul de la date de fin
-                $dateTimeStart->add(new DateInterval('P' . $interval . 'D'));
-                $task->setDateEnd($dateTimeStart->format('Y-m-d') . ' ' . $dateTimeEnd->format('H:i'));
-                $task->save();
-                Model::factory('performe')->delete(false, $idPerforme);
-                $this->dbh->commit();
-            }
-        }
-        catch (PDOException $e)
-        {
-            $this->dbh->rollBack();
-            var_dump($e->getMessage().' At line '.$e->getLine());
-            exit;
-        }
-    }*/
 
 }

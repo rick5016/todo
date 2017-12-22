@@ -6,64 +6,77 @@ class Front_InboxController extends Controller
     function taskAction()
     {
         $task_id = $this->getRequest()->getParam('id');
-        if (isset($task_id) && !empty($task_id)) {
-            $task = Model::factory('task')->loadOne(true, array('task.id' => $task_id));
-        } else
+        if (isset($task_id) && !empty($task_id))
         {
-            $task = new ORM_Task();
-            $this->view->new  = true;
+            $task                     = Model::factory('task')->loadOne(true, array('task.id' => $task_id));
+            $this->view->modification = true;
+        }
+        else
+        {
+            $task            = new ORM_Task();
+            $this->view->new = true;
         }
         
+        // Création du nouveau projet pour l'intégrer dans le formulaire de modification
+        if ($this->getRequest()->isPost())
+        {
+            $params     = $this->getRequest()->getParams();
+            $project_id = $params['project'];
+            if (empty($project_id) && !empty($params['project_new']))
+            {
+                $project           = new ORM_Project(array('name' => $params['project_new']));
+                $project->save();
+                $params['project'] = $project->getId();
+            }
+        }
+
         $form = new Form_task($task, Model::factory('project')->load(false));
         if ($this->getRequest()->isPost())
         {
-            if ($form->isValid($this->getRequest()->getParams()))
+
+            if ($form->isValid($params))
             {
-                $task             = ORM_Repository::factory('task')->saveTask($this->getRequest()->getParams(), $task);
-                $this->view->task = $task;
+                $task       = ORM_Repository::factory('task')->saveTask($params, $task);
+                $this->view->modification = true;
+                $this->view->validation   = true;
             }
         }
-        $this->view->form         = $form;
-        $this->view->projects     = Model::factory('project')->load(false);
+        $this->view->task     = $task;
+        $this->view->form     = $form;
     }
     
     function indexAction()
     {
-        $return   = array();
-        $tri      = array();
-        $clause   = array();
-        $priority = $this->getRequest()->getParam('priority', '11111');
-        $filtre   = $this->getRequest()->getParam('filtre');
+        $tasks    = array();
+        $datas    = array();
         $form     = new Form_filtres();
         $form->isValid($this->getRequest());
 
-        $tasks = ORM_Repository::factory('task')->loadInbox($clause, $priority, $filtre);
-        foreach ($tasks as $task)
+        foreach (ORM_Repository::factory('task')->loadInbox($this->getRequest()) as $task)
         {
             $task->setDateAffichage();
-            $task->setMoment();
-
-            // TODO : ordre a revoir 
+            $task->setMoment(); // A revoir
+            $task->setNbPerforme();
+            
+            // TODO : a revoir 
             // 1 : en fonction de l'heure de la journée
             // 2 : les tâches ne se finissant pas aujourd'hui doivent etre en fin de liste
             $date_affichage_dateTime = new DateTime($task->dateAffichage);
-            $tri[$date_affichage_dateTime->format('Y-m-d-H-i') . '-' . $task->priority][] = $task;
-
-            $task->nbPerforme = $task->count();
+            $datas[$date_affichage_dateTime->format('Y-m-d-H-i') . '-' . $task->priority][] = $task;
         }
-        ksort($tri);
-        foreach ($tri as $datas)
+        ksort($datas);
+        foreach ($datas as $data)
         {
-            foreach ($datas as $taskObj) {
-                $return[] = $taskObj;
+            foreach ($data as $taskObj) {
+                $tasks[] = $taskObj;
             }
         }
         
-        $this->view->filtre   = $filtre;
+        $this->view->filtre   = $this->getRequest()->getParam('filtre');
         $this->view->details  = (isset($_SESSION['details']) && $_SESSION['details']);
-        $this->view->priority = $priority;
+        $this->view->priority = $this->getRequest()->getParam('priority', '11111');;
         $this->view->form     = $form;
-        $this->view->tasks    = $return;
+        $this->view->tasks    = $tasks;
     }
     
     function deleteAction()
@@ -74,7 +87,7 @@ class Front_InboxController extends Controller
             Model::factory('task')->delete(true, $id);
         }
         
-        header('Location: ' . $_SERVER['HTTP_REFERER']);
+        header('Location: ' . $this->getRequest()->getReferer());
         exit;
     }
 
@@ -91,10 +104,10 @@ class Front_InboxController extends Controller
         $idPerforme = $this->getRequest()->getParam('idPerforme');
         
         if (isset($id) && isset($idPerforme)) {
-            Model::factory('task')->deleteLastPerforme($id, $idPerforme);
+            ORM_Repository::factory('task')->deleteLastPerforme($id, $idPerforme);
         }
         
-        header('Location: ' . $_SERVER['HTTP_REFERER']);
+        header('Location: ' . $this->getRequest()->getReferer());
         exit;
     }
 }

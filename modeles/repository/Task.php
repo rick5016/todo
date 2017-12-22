@@ -3,16 +3,18 @@
 class Repository_Task extends ORM_Task
 {
     
-    function loadInbox($clause = array(), $priority = "11111", $filtre = null)
+    function loadInbox($request)
     {
-        $result = array();
+        $priority  = $request->getParam('priority', '11111');
+        $filtre    = $request->getParam('filtre');
+        $result    = array();
         if ($priority == "00000") {
             return $result;
         }
         
         try {
             $query = 'select 
-                project.id as project_id, project.name as project_name, project.created as project_created, project.updated as project_updated, 
+                project.id as project_id, project.name as project_name, project.color as project_color, project.created as project_created, project.updated as project_updated, 
                 task.id as task_id, task.name as task_name, idProject, priority, dateStart, dateEnd, reiterate, interspace, reiterateEnd, untilDate, untilNumber, task.created as task_created, task.updated as task_updated, 
                 performe.id as performe_id, idTask, performe.created as performe_created, performe.updated as performe_updated
                 from project
@@ -25,29 +27,7 @@ class Repository_Task extends ORM_Task
                     where performe.idTask = task.id
                     limit 1
                 )
-                where (reiterate != 0 OR (reiterate = 0 AND performe.id is null))';
-            
-            if (count($clause) > 0)
-            {
-                // Ajout de la clause where
-                $nbWhere = count($clause);
-                if ($nbWhere > 0)
-                {
-                    $query .= " and";
-                    foreach ($clause as $key => $value)
-                    {
-                        if (is_numeric($key)) {
-                            $query .= ' ' . $value;
-                        } else {
-                            $query .= ' ' . $key . ' = ' . $value;
-                        }
-                    }
-                    $nbWhere--;
-                    if ($nbWhere > 0) {
-                        $query .= ' and';
-                    }
-                }
-            }
+                where active = 1 and (reiterate != 0 OR (reiterate = 0 AND performe.id is null))';
             
             if ($priority != "11111")
             {
@@ -76,6 +56,14 @@ class Repository_Task extends ORM_Task
             }
             if ((!isset($_SESSION['date_passee']) || !$_SESSION['date_passee']) || (isset($filtre) && $filtre == 'today')) {
                 $query .= ' and (date(dateStart) >= date(now()) or date(dateEnd) >= date(now()) or reiterate != 0)'; // N'affiche pas les dates dans le passé (sauf si elles se répètent)
+            }
+            
+            if (isset($_SESSION['project']) && is_array($_SESSION['project']) && count($_SESSION['project']) > 0) {
+                $query .= " and project.id IN (" . implode(', ', $_SESSION['project']) . ')';
+            } else if (isset($_SESSION['projectdel']) && is_array($_SESSION['projectdel']) && count($_SESSION['projectdel']) > 0) {
+                $query .= " and project.id NOT IN (" . implode(', ', $_SESSION['projectdel']) . ')'; 
+            } else {
+                $query .= " and project.id IN ('')";
             }
             
             $query .= ' order by dateStart, priority, performe_id desc';
@@ -233,7 +221,7 @@ class Repository_Task extends ORM_Task
         {
             $lastDate = $date;
             
-            // TODO : la date de début d'une ité"ration au mois doit avoir le même jour que la date d'origine, sinon, on passe au mois suivant
+            // TODO : la date de début d'une itération au mois doit avoir le même jour que la date d'origine, sinon, on passe au mois suivant
             $dateTime = new DateTime($date);
             $reiterate_type = 'D';
             if ($reiterate == 2) { // Semaine
@@ -255,7 +243,7 @@ class Repository_Task extends ORM_Task
             return $lastDate . ' ' . $dateTimeOrigine->format('H:i') . ':00';
         }
     }
-    /*
+    
     function deleteLastPerforme($id, $idPerforme)
     {
         try {
@@ -265,13 +253,12 @@ class Repository_Task extends ORM_Task
                 $dateTimeStart  = new DateTime($task->dateStart);
                 $dateTimeEnd  = new DateTime($task->dateEnd);
 
-                // Calcul de l'interval
+                // Calcul de l'interval de jour entre la date de début et la date de fin
                 $diff = $dateTimeStart->diff($dateTimeEnd);
                 $interval = $diff->format('%a');
                 
                 // Calcul de la date de début
-                // TODO : gestion des semaines/mois/annees
-                $dateTimeStart->sub(new DateInterval('P' . $task->interspace . 'D'));
+                $dateTimeStart->sub(new DateInterval('P' . $task->getInterspace() . $task->getReiterateLetter()));
                 $task->setDateStart($dateTimeStart->format('Y-m-d H:i'));
 
                 // Calcul de la date de fin
@@ -288,11 +275,11 @@ class Repository_Task extends ORM_Task
             var_dump($e->getMessage().' At line '.$e->getLine());
             exit;
         }
-    }*/
+    }
     
     public function saveTask($params, $task)
     {
-        $project_id     = $params['project_id'];
+        $project_id     = $params['project'];
         $task_name      = $params['task_name'];
         $priority       = isset($params['priority']) ? $params['priority'] : 0;
         $dateStartSave  = Model::dateFormat($params['dateStart']);
@@ -313,7 +300,7 @@ class Repository_Task extends ORM_Task
         if (isset($params['timeEnd']) && !empty($params['timeEnd'])) {
             $dateEndSave .= ' ' . $params['timeEnd'] . ':00';
         } else {
-            $dateStartSave .= ' 00:00:00';
+            $dateEndSave .= ' 00:00:00';
         }
 
         $task->setDateStart($dateStartSave);
