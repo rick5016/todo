@@ -15,4 +15,5 @@ $routes = array(
     '/delete'             => 'front/inbox#delete',
     '/performe'           => 'front/inbox#performe',
     '/cancel'             => 'front/inbox#cancel',
+    '/ia'                 => 'common/index#ia',
 );

@@ -96,6 +96,7 @@
                         </div>
                     {% endfor %}
                 </div>
+                <footer style="border:solid 1px black;position: absolute;bottom: 0;width: 19%;"><input type="text" id="ia" name="ia" style="width: 95%;padding: 0"/><div id="iasubmit" style="width: 5%;float: right;padding: 0;padding-left: 5px;cursor: pointer;"> ></div></footer>
             </div>
             <div class="sep"></div>
             <div class="content" style="float: left;">
@@ -108,6 +109,10 @@
     $(function()
     {
         displayDate();
+        
+        $(document).on('click', '#iasubmit', function() {
+            ajaxIa($('#ia'));
+        });
         
         // Supprimer un projet
         $(document).on('click', '.delete', function() {
@@ -166,6 +171,30 @@
     
     //----------------------------------AJAX------------------------------------
     
+    // IA
+    function ajaxIa(button)
+    {
+        $.ajax({
+            beforeSend	: function () {
+                $('#warpper').show();
+            },
+            url		: 'http://projetdetest.dev.s2h.corp/ia',
+            async	: true,
+            dataType 	: 'json',
+            data 		: {
+                'phrase': button.val()
+            },
+            success 	: function (data) {
+                //button.val();
+                $('.content').html(data);
+                $('#warpper').hide();
+            },
+            error		: function ( xml, status, e ) {
+                alert(e);
+                $('#warpper').hide();
+            }
+        });
+    }
     // activer/desactiver un projet
     function ajaxProjectsActivation(button)
     {

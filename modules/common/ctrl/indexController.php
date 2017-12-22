@@ -2,6 +2,106 @@
 
 class IndexController extends Controller
 {
+    function iaAction()
+    {
+        $phrase = $this->getRequest()->getParam('phrase');
+
+        // apprendre
+        if (isset($phrase))
+        {
+            $mots = explode(' ', $phrase);
+            
+            foreach ($mots as $mot)
+            {
+                $mot  = trim(strtolower($mot));
+                $mot  = str_replace('"', "'", $mot);
+                $mot  = str_replace('.', " ", $mot);
+                $mot  = str_replace(',', " ", $mot);
+                $mot  = str_replace(';', " ", $mot);
+                if (!empty($mot))
+                {
+                    $find = Model::factory('ia')->load(false, array('mot' => '"' . $mot . '"'));
+
+                    if (!$find)
+                    {
+                        $ia = new ORM_Ia(array('mot' => $mot));
+                        $ia->save();
+                    }
+                }
+            }
+        }
+
+        // comprendre
+        $arrays = array('ajouter', 'supprimer', 'projet', 'tache', 'quand', 'titre', 'reiterate', 'quandJour', 'quandMois');
+        
+        // Ajouter/créer (supprimer/retirer) tâche (projet) aujourd'hui/maintenant titre/s'appele nomdelatâche tous les (x) jours (ou unique)
+        $ajouter   = array('ajou', 'cre');
+        $supprimer = array('sup', 'retir');
+        $projet    = array('projet');
+        $tache     = array('tach');
+        $titre     = array('titre', 'apel', 'appel', 'proj', 'tach', 'nomm');
+        $titresCrit = array('titre', 'apel', 'appel', 'proj', 'tach', 'nomm');
+        $titrepos  = false;
+        $quand     = array('aujourd', 'maintenan');
+        $reiterate = array('tou');
+        $quandJour = array('jour');
+        $quandMois = array('moi');
+
+        foreach ($arrays as $array) {
+            $val = false;
+            foreach ($$array as $haystack) {
+                if (strpos($phrase, $haystack) !== false) {
+                    $val = true;
+                }
+            }
+            $$array = $val;
+        }
+        
+        // Répondre
+        if (!$ajouter && !$supprimer)
+            $retour = 'Quelle action souhaitez-vous effectuer ? Supprimer ou ajouter ?';
+        else
+        {
+            $retour = ($ajouter) ? 'Ajouter' : '';
+            $retour = (!$ajouter && $supprimer) ? 'Supprimer' : $retour;
+            
+            if (!$projet && !$tache)
+                $retour = 'Souhaitez vous ' . $retour . ' une tâche ou un projet ?';
+            else
+            {
+                $retour .= ($projet) ? ' un projet' : '';
+                $retour .= (!$projet && $tache) ? ' une tâche' : '';
+                
+                if ($titre)
+                {
+                    foreach ($mots as $key => $data)
+                    {
+                        foreach ($titresCrit as $titreCrit)
+                        {
+                            if (strpos($data, $titreCrit) !== false) {
+                                $titrepos = $key+1;
+                            }
+                        }
+                    }
+                    
+                    if (isset($mots[$titrepos]))
+                    {
+                        $retour .= ($titre) ? ' ayant pour titre : ' . $mots[$titrepos] : '';
+
+                        echo json_encode($retour . ' ?');
+                        exit;
+                    }
+                    
+                }
+                
+                $retour = 'Vous souhaitez ' . $retour . '. Il manque le titre';
+                
+            }
+        }
+
+        echo json_encode($retour);
+        exit;
+    }
 
     function indexAction()
     {
