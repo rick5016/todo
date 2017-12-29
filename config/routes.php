@@ -12,6 +12,7 @@ $routes = array(
     '/task'               => 'front/inbox#task',
     '/inbox'              => 'front/inbox#index',
     '/calendrier'         => 'front/calendrier#index',
+    '/day'                => 'front/calendrier#day',
     '/delete'             => 'front/inbox#delete',
     '/performe'           => 'front/inbox#performe',
     '/cancel'             => 'front/inbox#cancel',

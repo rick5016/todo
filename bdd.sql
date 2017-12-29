@@ -2,11 +2,13 @@ CREATE DATABASE `todo` /*!40100 DEFAULT CHARACTER SET utf8 */;
 CREATE TABLE `project` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `name` varchar(100) NOT NULL,
-  `color` varchar(45) NOT NULL,
+  `color` varchar(45) DEFAULT '#ffffff',
+  `active` int(11) NOT NULL DEFAULT '1',
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=239 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=254 DEFAULT CHARSET=utf8;
+
 CREATE TABLE `task` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `idProject` int(11) NOT NULL,
@@ -21,8 +23,11 @@ CREATE TABLE `task` (
   `untilNumber` int(11) DEFAULT '0' COMMENT 'x répétitions',
   `created` datetime DEFAULT CURRENT_TIMESTAMP,
   `updated` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
+  `dateStartOrigine` datetime DEFAULT NULL,
+  `dateEndOrigine` datetime DEFAULT NULL,
   PRIMARY KEY (`id`)
-) ENGINE=InnoDB AUTO_INCREMENT=72 DEFAULT CHARSET=utf8;
+) ENGINE=InnoDB AUTO_INCREMENT=115 DEFAULT CHARSET=utf8;
+
 CREATE TABLE `performe` (
   `id` int(11) NOT NULL AUTO_INCREMENT,
   `idTask` int(11) NOT NULL,
