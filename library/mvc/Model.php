@@ -15,7 +15,7 @@ class Model
             $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         catch (PDOException $e) {
-                echo 'Connexion échouée : ' . $e->getMessage();
+            throw new Exception('Connexion échouée : ' . $e->getMessage());
         }
         if (!empty($datas)) {
             $this->populate($datas, $foreign_keys, $className, $limit);
@@ -228,7 +228,7 @@ class Model
      * @param string $orderby Order by sous forme de string
      * @return array(array(object BDD)) $result RÃ©sultat sous forme de teableau d'objet
      */
-    function load($foreing_keys = false, $where = array(), $orderby = '')
+    function loadPrepare($foreing_keys = false, $where = array(), $orderby = '')
     {
         try
         {
@@ -245,46 +245,38 @@ class Model
             if ($foreing_keys) {
                 $query1 = $this->foreignKeysSelect($this, $query1);
             }
-            $query = substr($query1, 0, -1);
+            $query2 = substr($query1, 0, -1);
             
             // Ajout du nom de la classe
-            $query .= " from " . $this->bdd_name;
+            $query2 .= " from " . $this->bdd_name;
             
             // Ajout du nom des classes enfants ainsi que leurs relations
             if ($foreing_keys) {
-                $query = $this->foreignKeysFrom($this, $query);
+                $query2 = $this->foreignKeysFrom($this, $query2);
             }
-
-            // Ajout de la clause where
+            
             $nbWhere = count($where);
             if ($nbWhere > 0)
             {
-                $query .= " where";
-                foreach ($where as $key => $value)
-                {
-                    if (is_numeric($key)) {
-                        $query .= ' ' . $value;
-                    } else {
-                        $query .= ' ' . $key . ' = ' . $value;
-                    }
-                    $nbWhere--;
-                    if ($nbWhere > 0) {
-                        $query .= ' and';
-                    }
+                $query2 .= " where";
+                foreach ($where as $key => $value) {
+                    $query2 .= ' ' . $key . ' = :' . $key . ' and ';
                 }
             }
-
-            // Ajout de l'order by
-            if (!empty($orderby)) {
-                $query .= " order by " . $orderby;
+            $query = substr($query2, 0, -5);
+            $stmt  = $this->dbh->prepare($query);
+            if ($nbWhere > 0)
+            {
+                foreach ($where as $key => $value) {
+                    $stmt->bindValue(':' . $key, $value);
+                }
             }
-            $stmt  = $this->dbh->query($query);
-            if ($stmt) {
+            if ($this->execute($stmt)) {
                 while($data = $stmt->fetch())
                 {
                     $className = 'ORM_' . $this->bdd_name;
                     $result[] = new $className($data, $foreing_keys);
-                }  
+                }
             }
         }
         catch (PDOException $e) {
@@ -292,6 +284,71 @@ class Model
         }
         return $result;
     }
+    
+//    function loadOld($foreing_keys = false, $where = array(), $orderby = '')
+//    {
+//        try
+//        {
+//            $result = array();
+//            $query1 = "select";
+//            
+//            // Ajout des attributs de la class
+//            foreach ($this->attributs as $key => $attribut)
+//            {
+//                $query1 .= ' ' . $this->bdd_name . '.' . $key . ' as ' . $this->bdd_name . '_' . $key . ',';
+//            }
+//            
+//            // Ajout des attributs des classes enfants rÃ©cursivement
+//            if ($foreing_keys) {
+//                $query1 = $this->foreignKeysSelect($this, $query1);
+//            }
+//            $query = substr($query1, 0, -1);
+//            
+//            // Ajout du nom de la classe
+//            $query .= " from " . $this->bdd_name;
+//            
+//            // Ajout du nom des classes enfants ainsi que leurs relations
+//            if ($foreing_keys) {
+//                $query = $this->foreignKeysFrom($this, $query);
+//            }
+//
+//            // Ajout de la clause where
+//            $nbWhere = count($where);
+//            if ($nbWhere > 0)
+//            {
+//                $query .= " where";
+//                foreach ($where as $key => $value)
+//                {
+//                    if (is_numeric($key)) {
+//                        $query .= ' ' . $value;
+//                    } else {
+//                        $query .= ' ' . $key . ' = ' . $value;
+//                    }
+//                    $nbWhere--;
+//                    if ($nbWhere > 0) {
+//                        $query .= ' and';
+//                    }
+//                }
+//            }
+//
+//            // Ajout de l'order by
+//            if (!empty($orderby)) {
+//                $query .= " order by " . $orderby;
+//            }
+//            $stmt  = $this->dbh->query($query);
+//            if ($stmt) {
+//                while($data = $stmt->fetch())
+//                {
+//                    $className = 'ORM_' . $this->bdd_name;
+//                    $result[] = new $className($data, $foreing_keys);
+//                }  
+//            }
+//        }
+//        catch (PDOException $e) {
+//            throw new Exception($e->getMessage());
+//        }
+//        return $result;
+//    }
     
     /**
      * Permet de rÃ©cupÃ©rer le premier rÃ©sultat de la fonction load

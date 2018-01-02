@@ -25,7 +25,7 @@ class Form_login extends form
     {
         $isValid = parent::isValid($params);
         if ($isValid) {
-            $user = Model::factory('task')->loadOne(false, array('login' => $params['login'], 'password' => $params['password']));
+            $user = Model::factory('user')->loadOne(false, array('login' => $params['username'], 'password' => $params['password']));
         }
         
         return false;
