@@ -245,25 +245,25 @@ class Model
             if ($foreing_keys) {
                 $query1 = $this->foreignKeysSelect($this, $query1);
             }
-            $query2 = substr($query1, 0, -1);
+            $query = substr($query1, 0, -1);
             
             // Ajout du nom de la classe
-            $query2 .= " from " . $this->bdd_name;
+            $query .= " from " . $this->bdd_name;
             
             // Ajout du nom des classes enfants ainsi que leurs relations
             if ($foreing_keys) {
-                $query2 = $this->foreignKeysFrom($this, $query2);
+                $query = $this->foreignKeysFrom($this, $query);
             }
             
             $nbWhere = count($where);
             if ($nbWhere > 0)
             {
-                $query2 .= " where";
+                $query .= " where";
                 foreach ($where as $key => $value) {
-                    $query2 .= ' ' . $key . ' = :' . $key . ' and ';
+                    $query .= ' ' . $key . ' = :' . $key . ' and ';
                 }
+                $query = substr($query, 0, -5);
             }
-            $query = substr($query2, 0, -5);
             $stmt  = $this->dbh->prepare($query);
             if ($nbWhere > 0)
             {

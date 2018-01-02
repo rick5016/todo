@@ -10,18 +10,18 @@ class IndexController extends Controller
         // apprendre
         if (isset($phrase))
         {
+            $phrase  = str_replace('"', "'", $phrase);
+            $phrase  = str_replace('.', " ", $phrase);
+            $phrase  = str_replace(',', " ", $phrase);
+            $phrase  = str_replace(';', " ", $phrase);
             $mots = explode(' ', $phrase);
             
             foreach ($mots as $mot)
             {
                 $mot  = trim(strtolower($mot));
-                $mot  = str_replace('"', "'", $mot);
-                $mot  = str_replace('.', " ", $mot);
-                $mot  = str_replace(',', " ", $mot);
-                $mot  = str_replace(';', " ", $mot);
                 if (!empty($mot))
                 {
-                    $find = Model::factory('ia')->load(false, array('mot' => '"' . $mot . '"'));
+                    $find = Model::factory('ia')->load(false, array('mot' => $mot));
 
                     if (!$find)
                     {
@@ -59,6 +59,7 @@ class IndexController extends Controller
         }
         
         // Répondre
+        
         if (!$ajouter && !$supprimer)
             $retour = 'Quelle action souhaitez-vous effectuer ? Supprimer ou ajouter ?';
         else
@@ -92,16 +93,39 @@ class IndexController extends Controller
                         echo json_encode($retour . ' ?');
                         exit;
                     }
-                    
                 }
-                
                 $retour = 'Vous souhaitez ' . $retour . '. Il manque le titre';
-                
             }
         }
 
         echo json_encode($retour);
         exit;
+    }
+    function ia($params)
+    {
+        if (!isset($params['action'])) {
+            return 'action';
+        }
+        $this->iaAction($params);
+    }
+    
+    function iaAction($params)
+    {
+        if (!isset($params['object'])) {
+            return 'object';
+        }
+        $this->iaObject($params);
+    }
+    
+    function iaObject($params)
+    {
+        if (!isset($params['name'])) {
+            return 'name';
+        }
+        // add / delete ($params['action'])
+        // project / task($params['object'])
+        // name ($params['name'])
+        
     }
     
     function loginAction()
@@ -111,13 +135,13 @@ class IndexController extends Controller
             header('Location: http://' . $_SERVER['SERVER_NAME'] . ROOT_ACCUEIL);
             exit();
         }
-        $loginSubmit = $this->getRequest()->getParam('login-submit');
+        $loginSubmit    = $this->getRequest()->getParam('login-submit');
         $registerSubmit = $this->getRequest()->getParam('register-submit');
-        
+
         $this->template = false;
-        $formLogin = new Form_login();
-        $formRegister = new Form_register();
-        $params = $this->getRequest()->getParams();
+        $formLogin      = new Form_login();
+        $formRegister   = new Form_register();
+        $params         = $this->getRequest()->getParams();
         if ($this->getRequest()->isPost() && isset($loginSubmit) && $formLogin->isValid($params)) {
             header('Location: http://' . $_SERVER['SERVER_NAME'] . ROOT_ACCUEIL);
         }
@@ -126,10 +150,7 @@ class IndexController extends Controller
             $this->view->registerDisplay = true;
             if ($formRegister->isValid($params))
             {
-    //            $user = $this->loadOne(false, array('login' => $params['login'], 'password' => $params['password']));
-    //            if ($user) {
-    //                $_SESSION['user'] = $user;
-    //            }
+                // TODO
             }
         }
         $this->view->login = $formLogin;
