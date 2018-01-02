@@ -108,7 +108,7 @@ class IndexController extends Controller
     {
         if (isset($_SESSION['user']))
         {
-            header('Location: http://' . $_SERVER['SERVER_NAME']);
+            header('Location: http://' . $_SERVER['SERVER_NAME'] . ROOT_ACCUEIL);
             exit();
         }
         $loginSubmit = $this->getRequest()->getParam('login-submit');
@@ -118,12 +118,8 @@ class IndexController extends Controller
         $formLogin = new Form_login();
         $formRegister = new Form_register();
         $params = $this->getRequest()->getParams();
-        if ($this->getRequest()->isPost() && isset($loginSubmit) && $formLogin->isValid($params))
-        {
-//            $user = $this->loadOne(false, array('login' => $params['login'], 'password' => $params['password']));
-//            if ($user) {
-//                $_SESSION['user'] = $user;
-//            }
+        if ($this->getRequest()->isPost() && isset($loginSubmit) && $formLogin->isValid($params)) {
+            header('Location: http://' . $_SERVER['SERVER_NAME'] . ROOT_ACCUEIL);
         }
         if ($this->getRequest()->isPost() && isset($registerSubmit))
         {
@@ -138,6 +134,12 @@ class IndexController extends Controller
         }
         $this->view->login = $formLogin;
         $this->view->register = $formRegister;
+    }
+    
+    function logoutAction()
+    {
+        Model::factory('user')->logout();
+        header('Location: http://' . $_SERVER['SERVER_NAME'] . '/login');
     }
 
     function indexAction()

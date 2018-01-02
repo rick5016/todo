@@ -26,6 +26,13 @@ class Form_login extends form
         $isValid = parent::isValid($params);
         if ($isValid) {
             $user = Model::factory('user')->loadOne(false, array('login' => $params['username'], 'password' => $params['password']));
+            if (!$user)
+            {
+                $this->getElement('username')->error = 'Utilisateur introuvable';
+                return false;
+            }
+            $user->setUser();
+            return true;
         }
         
         return false;

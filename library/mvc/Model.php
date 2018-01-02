@@ -228,7 +228,7 @@ class Model
      * @param string $orderby Order by sous forme de string
      * @return array(array(object BDD)) $result RÃ©sultat sous forme de teableau d'objet
      */
-    function loadPrepare($foreing_keys = false, $where = array(), $orderby = '')
+    function load($foreing_keys = false, $where = array(), $orderby = '')
     {
         try
         {

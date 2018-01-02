@@ -71,6 +71,13 @@ class Form
             return true;
         }
         
+        foreach ($this->elements as $element)
+        {
+            if (!empty($element->error)) {
+                return true;
+            }
+        }
+        
         return false;
     }
     

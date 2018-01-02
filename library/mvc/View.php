@@ -15,10 +15,6 @@ class View
         Twig_Autoloader::register();
         $this->twig = new Twig_Environment(new Twig_Loader_Filesystem("../modules"), array("cache" => $cache));
         $this->twig->addGlobal('app', new Plugin_Form());
-        
-        if ($this->renderTemplate) {
-            $this->view = $this->twig->load("/common/views/template.tpl");
-        }
     }
     
     public function __set($name, $arguments)
@@ -48,6 +44,7 @@ class View
             $path = $module . '/views/' . $action . '.tpl';
         }
         
+        // Rendu unique
         if (!$template || !empty($_SERVER['HTTP_X_REQUESTED_WITH']))
         {
             $viewScript = $this->twig->load($path);
@@ -60,12 +57,12 @@ class View
                 exit;
             }
             
-            // Rendu unique
             echo $render;
             exit;
         }
         
-        // Page classique
+        // Rendu avec template
+        $this->view = $this->twig->load("/common/views/template.tpl");
         $viewScript = $this->twig->load($path);
         $content    = $viewScript->render(array('content' => ob_get_clean()) + $this->parameters);
         

@@ -35,7 +35,7 @@ class Controller
 
         $this->{$this->action . 'Action'}();
 
-        if (!($this->action != 'index' && $this->ctrl != 'index' && $this->module != 'common') && $this->template && empty($_SERVER['HTTP_X_REQUESTED_WITH']))
+        if (!($this->action == 'index' && $this->ctrl == 'index' && $this->module == 'common') && $this->template && empty($_SERVER['HTTP_X_REQUESTED_WITH']))
         {
             $controllerFront = new IndexController();
             $controllerFront->indexAction();

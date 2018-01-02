@@ -29,7 +29,12 @@ class Router
             $ctrlName = (strtolower($moduleCtrlAction[1]) != 'common') ? ucfirst($moduleCtrlAction[1]) . '_' : '';
             $ctrlName .= ucfirst($ctrlAction[1]) . 'Controller';
 
-            $controller = new $ctrlName($ctrlAction[0], $ctrlAction[1], $moduleCtrlAction[1]);
+            if ($ctrlAction[0] == 'index' && $ctrlAction[1] == 'index' && $moduleCtrlAction[1] == 'common') {
+                header('Location: http://' . $_SERVER['SERVER_NAME'] . ROOT_ACCUEIL);
+            } else {
+                $controller = new $ctrlName($ctrlAction[0], $ctrlAction[1], $moduleCtrlAction[1]);
+            }
+            
             $controller->execute();
         }
         catch (Exception $exception)

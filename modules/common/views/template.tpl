@@ -71,6 +71,7 @@
                     <li><a href="/inbox"><span title="boîte de réception" class="glyphicon glyphicon-inbox"></span> Boîte de réception</a></li>
                     <li><a href="/calendrier"><span title="calendrier" class="glyphicon glyphicon-calendar"></span> Calendrier</a></li>
                     <li><a href="/day"><span title="day" class="glyphicon glyphicon-calendar"></span> Calendrier/jour</a></li>
+                    <li><a href="/logout"><span title="day" class="glyphicon glyphicon-log-out"></span> Déconnexion</a></li>
                 </ul>
                 <div style="text-align:center"><span><a href="">Projets</a> / <a href="">Labels</a> / <a href="">Filtres</a></span></div>
                 <div id="dialogDelete" style="display:none;"></div>
