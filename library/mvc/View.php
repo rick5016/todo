@@ -7,7 +7,7 @@ class View
     public $view;
     public $parameters = array();
 
-    public function __construct($ajax = false)
+    public function __construct()
     {
         $cache = false;
 //        $cache = '../temp/views';
@@ -16,22 +16,9 @@ class View
         $this->twig = new Twig_Environment(new Twig_Loader_Filesystem("../modules"), array("cache" => $cache));
         $this->twig->addGlobal('app', new Plugin_Form());
         
-        if (!$ajax) {
+        if ($this->renderTemplate) {
             $this->view = $this->twig->load("/common/views/template.tpl");
         }
-    }
-    
-    public function renderViewScript($path)
-    {
-        $viewScript = $this->twig->load($path);
-        $content    = $viewScript->render(array('content' => ob_get_clean()) + $this->parameters);
-
-        return $this->view->render(array('content' => $content) + $this->parameters);
-    }
-    
-    public function renderViewScriptAjax()
-    {
-        return json_encode($this->view->render($this->parameters));
     }
     
     public function __set($name, $arguments)
@@ -51,5 +38,38 @@ class View
     public function add(array $params)
     {
         $this->parameters += $params;
+    }
+    
+    public function renderViewScript($action, $ctrl, $module, $template)
+    {
+        if (file_exists(ROOT_PATH . '/modules/' . $module . '/views/' . $ctrl . '#' . $action . '.tpl')) {
+            $path = $module . '/views/' . $ctrl . '#' . $action . '.tpl';
+        } else {
+            $path = $module . '/views/' . $action . '.tpl';
+        }
+        
+        if (!$template || !empty($_SERVER['HTTP_X_REQUESTED_WITH']))
+        {
+            $viewScript = $this->twig->load($path);
+            $render = $viewScript->render(array('content' => ob_get_clean()) + $this->parameters);
+            
+            // AJAX
+            if  (!empty($_SERVER['HTTP_X_REQUESTED_WITH']))
+            {
+                echo json_encode($render);
+                exit;
+            }
+            
+            // Rendu unique
+            echo $render;
+            exit;
+        }
+        
+        // Page classique
+        $viewScript = $this->twig->load($path);
+        $content    = $viewScript->render(array('content' => ob_get_clean()) + $this->parameters);
+        
+        echo $this->view->render(array('content' => $content) + $this->parameters);
+        exit;
     }
 }

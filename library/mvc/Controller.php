@@ -3,44 +3,19 @@
 class Controller
 {
 
+    public $action;
+    public $ctrl;
+    public $module;
     public $view        = null;
     protected $_request = null;
-    public $uri;
+    public $template    = true;
 
-    public function __construct($ajax = false)
+    public function __construct($action = 'index', $ctrl = 'index', $module = 'common')
     {
-        $this->view = new View($ajax);
-    }
-
-    public function execute($action = 'index')
-    {
-        if (method_exists($this, $action . 'Action'))
-        {
-            $this->{$action . 'Action'}();
-        }
-        else
-        {
-            throw new Exception($action . 'Action n\'existe pas');
-        }
-    }
-    
-    public function renderViewScript($action = 'index', $ctrl = 'index', $module = 'common')
-    {
-        if (file_exists(ROOT_PATH . '/modules/' . $module . '/views/' . $ctrl . '#' . $action . '.tpl')) {
-            echo $this->view->renderViewScript($module . '/views/' . $ctrl . '#' . $action . '.tpl');
-        } else {
-            echo $this->view->renderViewScript($module . '/views/' . $action . '.tpl');
-        } 
-    }
-    
-    public function renderViewScriptAjax($action = 'index', $ctrl = 'index', $module = 'common')
-    {
-        if (file_exists(ROOT_PATH . '/modules/' . $module . '/views/' . $ctrl . '#' . $action . '.tpl')) {
-            $this->view->view = $this->view->twig->load($module . '/views/' . $ctrl . '#' . $action . '.tpl');
-        } else {
-            $this->view->view = $this->view->twig->load($module . '/views/' . $action . '.tpl');
-        }
-        echo $this->view->renderViewScriptAjax();
+        $this->action = $action;
+        $this->ctrl   = $ctrl;
+        $this->module = $module;
+        $this->view   = new View();
     }
 
     public function getRequest()
@@ -52,4 +27,21 @@ class Controller
         return $this->_request;
     }
 
+    public function execute()
+    {
+        if (!method_exists($this, $this->action . 'Action')) {
+            throw new Exception($this->action . 'Action n\'existe pas');
+        }
+
+        $this->{$this->action . 'Action'}();
+
+        if (!($this->action != 'index' && $this->ctrl != 'index' && $this->module != 'common') && $this->template && empty($_SERVER['HTTP_X_REQUESTED_WITH']))
+        {
+            $controllerFront = new IndexController();
+            $controllerFront->indexAction();
+            $this->view->add($controllerFront->view->parameters);
+        }
+
+        $this->view->renderViewScript($this->action, $this->ctrl, $this->module, $this->template);
+    }
 }

@@ -11,8 +11,8 @@ class Model
         try
         {
             $this->dbh = new PDO($settings['database']['dsn'], $settings['database']['user'], $settings['database']['password']);
-            $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
             $this->dbh->setAttribute(PDO::ATTR_EMULATE_PREPARES, false);
+            $this->dbh->setAttribute(PDO::ATTR_ERRMODE, PDO::ERRMODE_EXCEPTION);
         }
         catch (PDOException $e) {
                 echo 'Connexion échouée : ' . $e->getMessage();
@@ -210,8 +210,7 @@ class Model
             $this->dbh->commit();
         }
         catch (PDOException $e) {
-            var_dump($e->getMessage().' At line '.$e->getLine());
-            exit;
+            throw new Exception($e->getMessage());
         }
     }
     
@@ -289,8 +288,7 @@ class Model
             }
         }
         catch (PDOException $e) {
-            var_dump($e->getMessage().' At line '.$e->getLine());
-            exit;
+            throw new Exception($e->getMessage());
         }
         return $result;
     }

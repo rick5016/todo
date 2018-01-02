@@ -35,3 +35,12 @@ CREATE TABLE `performe` (
   `updated` datetime DEFAULT NULL ON UPDATE CURRENT_TIMESTAMP,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=80 DEFAULT CHARSET=utf8;
+CREATE TABLE `user` (
+  `id` int(11) NOT NULL AUTO_INCREMENT,
+  `login` varchar(255) NOT NULL,
+  `password` varchar(255) NOT NULL,
+  `active` int(11) DEFAULT '1',
+  `created` datetime DEFAULT CURRENT_TIMESTAMP,
+  `updated` varchar(45) DEFAULT 'ON UPDATE CURRENT_TIMESTAMP',
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=utf8;

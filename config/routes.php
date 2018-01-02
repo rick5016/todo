@@ -1,11 +1,10 @@
 <?php
 
-// name => module/ctrl#action
-// Défault : '/' => '' (module 'common' par défaut et ctrl 'index' par défaut et action 'index' par défaut
-// Défault : '/' => 'action' (module 'common' par défaut et ctrl 'index' par défaut)
-// Défault : '/' => 'ctrl#action' (module 'common' par défaut)
+// name => module/ctrl#action (joue l'action du template : common/index#index)
+// name => array('module/ctrl#action', 0) (ne joue pas l'action du template)
 $routes = array(
-    '/'                   => '',
+    '/'                   => 'common/index#index',
+    '/login'              => 'common/index#login',
     '/projects'           => 'common/index#projects',
     '/projectscolor'      => 'common/index#projectscolor',
     '/projectsactivation' => 'common/index#projectsactivation',

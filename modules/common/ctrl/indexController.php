@@ -2,6 +2,7 @@
 
 class IndexController extends Controller
 {
+    
     function iaAction()
     {
         $phrase = $this->getRequest()->getParam('phrase');
@@ -102,9 +103,51 @@ class IndexController extends Controller
         echo json_encode($retour);
         exit;
     }
+    
+    function loginAction()
+    {
+        if (isset($_SESSION['user']))
+        {
+            header('Location: http://' . $_SERVER['SERVER_NAME']);
+            exit();
+        }
+        $loginSubmit = $this->getRequest()->getParam('login-submit');
+        $registerSubmit = $this->getRequest()->getParam('register-submit');
+        
+        $this->template = false;
+        $formLogin = new Form_login();
+        $formRegister = new Form_register();
+        $params = $this->getRequest()->getParams();
+        if ($this->getRequest()->isPost() && isset($loginSubmit) && $formLogin->isValid($params))
+        {
+//            $user = $this->loadOne(false, array('login' => $params['login'], 'password' => $params['password']));
+//            if ($user) {
+//                $_SESSION['user'] = $user;
+//            }
+        }
+        if ($this->getRequest()->isPost() && isset($registerSubmit))
+        {
+            $this->view->registerDisplay = true;
+            if ($formRegister->isValid($params))
+            {
+    //            $user = $this->loadOne(false, array('login' => $params['login'], 'password' => $params['password']));
+    //            if ($user) {
+    //                $_SESSION['user'] = $user;
+    //            }
+            }
+        }
+        $this->view->login = $formLogin;
+        $this->view->register = $formRegister;
+    }
 
     function indexAction()
     {
+        if (!isset($_SESSION['user']))
+        {
+            header('Location: http://' . $_SERVER['SERVER_NAME'] . '/login');
+            exit();
+        }
+        
         $projects = Model::factory('project')->load(false, array('active' => 1));
         if (!isset($_SESSION['project']))
         {
@@ -113,9 +156,11 @@ class IndexController extends Controller
                 $_SESSION['project'][] = $project->getId();
             }
         }
+        $this->view->user                 = (isset($_SESSION['user'])) ? $_SESSION['user'] : false;
         $this->view->projects             = $projects;
         $this->view->projectselections    = isset($_SESSION['project']) ? $_SESSION['project'] : array();
         $this->view->projectselectionsdel = isset($_SESSION['projectdel']) ? $_SESSION['projectdel'] : array();
+        
     }
 
     function projectsAction()

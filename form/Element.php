@@ -10,11 +10,21 @@ class Form_Element
     public $glyphicon;
     public $glyphiconStyle = array('margin-right' => '10px');
     public $required = false;
+    public $error = false;
     
     public function __construct($name, $value = '')
     {
         $this->name = $name;
         $this->value = $value;
+    }
+    
+    public function hasError()
+    {
+        if ($this->error !== false) {
+            return true;
+        }
+        
+        return false;
     }
     
     function get()
@@ -126,7 +136,7 @@ class Form_Element
         if ($this->required && empty($this->value))
         {
             if (!empty($this->libelle)) {
-                $this->error = $this->libelle . ' est obligatoire';
+                $this->error = 'Le champ ' . $this->libelle . ' est obligatoire';
             } else {
                 $this->error = $this->name . ' est obligatoire';
             }
