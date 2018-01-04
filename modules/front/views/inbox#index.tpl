@@ -160,7 +160,7 @@
             {% endif %}
                 
             <div style="float:left;height:100%;padding-top: 6px;padding-left: 0;">
-                <a href="/task?id={{ task.id }}"><span title="modifier" class="glyphicon glyphicon-edit"></span></a> <a title="supprimer" href="/delete?id={{ task.id }}"><span class="glyphicon glyphicon-remove"></span></a>
+                <a href="/task?id={{ task.id }}"><span title="modifier" class="glyphicon glyphicon-edit"></span></a> <a title="supprimer" class="deleteTask" id="{{ task.name }}___{{ task.id }}"><span class="glyphicon glyphicon-remove"></span></a>
             </div>
                 
             {% if details %}
@@ -203,3 +203,57 @@
         
     
 {% endfor %}
+<script>
+    $(function()
+    {
+        // Supprimer un projet
+        $(document).on('click', '.deleteTask', function() {
+            deleteTask($(this));
+        });
+    });
+    
+    function deleteTask(button)
+    {
+        var infos = button.attr('id').split('___');
+        var id = infos[1];
+        
+        $('#dialogDelete').attr('title', 'Supprimer une tâche');
+        $('#dialogDelete').html('Etes-vous sûr de vouloir supprimer la tâche : ' + infos[0] + ' ?')
+        
+        $('#dialogDelete').dialog({
+            resizable: false,
+            draggable: false,
+            height: "auto",
+            width: 400,
+            position: { my: "center top", at: "center top+60", of: window},
+            modal: true,
+            buttons : {
+                "Supprimer": function()
+                {
+                    $(this).dialog('close');
+                    $.ajax({
+                        beforeSend	: function () {
+                            $('#warpper').show();
+                        },
+                        url		: 'http://projetdetest.dev.s2h.corp/delete',
+                        async		: true,
+                        dataType 	: 'json',
+                        data 		: {
+                            'id': infos[1]
+                        },
+                        success 	: function () {
+                            window.location.reload();
+                        },
+                        error		: function ( xml, status, e ) {
+                            alert(e);
+                            $('#warpper').hide();
+                        }
+                    });
+                },
+                "Annuler": function() {
+                    $(this).dialog('close');
+                }
+            }
+        });
+    }
+</script>

@@ -101,7 +101,7 @@ class IndexController extends Controller
         echo json_encode($retour);
         exit;
     }
-    function ia($params)
+    function iaTodo($params)
     {
         if (!isset($params['action'])) {
             return 'action';
@@ -109,7 +109,7 @@ class IndexController extends Controller
         $this->iaAction($params);
     }
     
-    function iaAction($params)
+    function iaTodoAction($params)
     {
         if (!isset($params['object'])) {
             return 'object';
@@ -117,7 +117,7 @@ class IndexController extends Controller
         $this->iaObject($params);
     }
     
-    function iaObject($params)
+    function iaTodoObject($params)
     {
         if (!isset($params['name'])) {
             return 'name';
