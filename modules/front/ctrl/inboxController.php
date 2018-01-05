@@ -52,6 +52,9 @@ class Front_InboxController extends Controller
         $form     = new Form_filtres();
         $form->isValid($this->getRequest());
 
+        $test = ORM_Repository::factory('task')->getPerformed();
+        var_dump($test);
+        exit;
         foreach (ORM_Repository::factory('task')->loadInbox($this->getRequest()) as $task)
         {
             $task->setDateAffichage();
@@ -83,11 +86,13 @@ class Front_InboxController extends Controller
     {
         $id = $this->getRequest()->getParam('id');
         
-        if (isset($id)) {
-            Model::factory('task')->delete(true, $id);
+        if (!isset($id)) {
+            throw new Exception('id manquant');
         }
         
-        header('Location: ' . $this->getRequest()->getReferer());
+        Model::factory('task')->delete(true, (int) $id);
+        
+        echo json_encode('');
         exit;
     }
 

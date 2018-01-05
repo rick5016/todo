@@ -24,7 +24,8 @@ class ORM_Task extends Model
     protected $primary_key = 'id';
     protected $foreign_keys = array(
         'project' => array('project','idProject', 'id'),
-        'performes' => array('performe','id', 'idTask')
+        'performes' => array('performe','id', 'idTask'),
+        'performed' => array('performe',array('id' => 'idTask', 'performe.created' => '(SELECT MAX(created) FROM performe where performe.idTask = task.id limit 1)'))
     );
     
     function getReiterateLetter()

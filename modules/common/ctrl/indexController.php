@@ -171,7 +171,7 @@ class IndexController extends Controller
             exit();
         }
         
-        $projects = Model::factory('project')->load(false, array('active' => 1));
+        $projects = Model::factory('project')->load(array('active' => 1));
         if (!isset($_SESSION['project']))
         {
             $_SESSION['project'] = array();

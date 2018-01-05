@@ -11,18 +11,21 @@
             .floated {float: left;}
             .box {width: 100%; position:relative}
             .menu, .content {
-                width:80%; 
+                width:85%; 
                 box-sizing:border-box; 
                 padding:10px;
             }
-            .menu {width:20%; }
+            .menu {
+                width:15%; 
+                float: left;
+            }
             .clearfix {clear:both; padding:0}
             .sep {
                 background-color:black;
                 padding:0;
                 border-width: 10px;
                 position: absolute;
-                left:20%;
+                left:15%;
                 top:0;
                 bottom:0;
                 border-left: 1px dotted #ddd;
@@ -70,6 +73,17 @@
                 opacity: 0.8;
                 cursor: pointer;
             }
+            @media screen and (max-width: 800px)
+            {
+                .menu {
+                    width:100%;
+                    float: none;
+                }
+                .sep {
+                    opacity: 0;
+                }
+                
+            }
         </style>
         <script type="text/javascript" src="library/jquery.js"></script>
         <script type="text/javascript" src="library/jquery-ui.js"></script>
@@ -80,8 +94,8 @@
     <body>
         <div id="warpper" style="display:none"></div>
         <div class="box" style="padding:0;margin:0;">
-            <div class="menu" style="height:100%;background-color:#F5F5F5;float: left;">
-                <div id="display_date" style="border: 1px black dotted;text-align:center;margin-right:20px;margin-bottom: 20px;">{{ "now"|date('d/m/Y H:i', timezone="Europe/Paris") }}</div>
+            <div class="menu" style="height:100%;background-color:#F5F5F5;">
+                <div id="display_date" style="border: 1px black dotted;text-align:center;margin-right:20px;margin-bottom: 20px;"></div>
                 <ul style="list-style-type:none;">
                     <li><a href="/inbox?filtre=today"><span title="boîte de réception" class="glyphicon glyphicon-calendar"></span> Aujourd'hui</a></li>
                     <li><a href="/task"><span title="ajouter" class="glyphicon glyphicon-plus"></span> Ajouter une tâche</a></li>
@@ -119,7 +133,7 @@
                 <div id="tchat" style="border:solid 1px black;"></div>
                 <div class="clearfix"></div>
                 <div style="padding:0;margin:10px;">
-                    <input type="text" id="ia" name="ia" style="width: 90%;padding: 0; height:26px; float:left;"/><input type="submit" id="iasubmit" value=">" style="float:left;width:10%;" />
+                    <input type="text" id="ia" name="ia" style="width: 89%;padding: 0; height:26px; float:left;"/><input type="submit" id="iasubmit" value=">" style="float:left;width:10%;" />
                 </div>
                 <div class="clearfix"></div>
             </div>
