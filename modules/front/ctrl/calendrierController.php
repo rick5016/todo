@@ -77,7 +77,7 @@ class Front_CalendrierController extends Controller
                 }
             }
         }
-
+        
         $this->view->tab_cal = $tab_cal;
     }
 
@@ -115,7 +115,7 @@ class Front_CalendrierController extends Controller
             if ($dateStartOrigine <= $date_compare && $date_compare <= $dateEndOrigine)
             {
                 $performe       = 0;
-                $performeSearch = Model::factory('performe')->loadOne(false, array('idTask' => $task->id, "created >= '$dateStartOrigine' and created <= '$dateEndOrigine'"));
+                $performeSearch = Model::factory('performe')->setWhere(array('idTask' => $task->id, "created >= '$dateStartOrigine' and created <= '$dateEndOrigine'"))->loadOne();
                 if ($performeSearch) {
                     $performe = 1;
                 } elseif ($date > date('Y-m-d')) {

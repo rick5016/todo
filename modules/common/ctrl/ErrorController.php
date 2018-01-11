@@ -27,14 +27,13 @@ class ErrorController extends Controller
         header("HTTP/1.0 404 Not Found");
 
         $this->template = false;
-        // sets the error to be rendered in the view
         $this->view->error = $this->_exception->getMessage();
+        $this->view->query = $_SESSION['query'];
         $this->view->xdebug_message = $this->_exception->xdebug_message;
 
         // logs the error to the log
         error_log($this->view->error);
         error_log($this->_exception->getTraceAsString());
-//        exit;
     }
 
 }

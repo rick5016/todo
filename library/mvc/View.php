@@ -12,7 +12,6 @@ class View
         $cache = false;
 //        $cache = '../temp/views';
         
-        Twig_Autoloader::register();
         $this->twig = new Twig_Environment(new Twig_Loader_Filesystem("../modules"), array("cache" => $cache));
         $this->twig->addGlobal('app', new Plugin_Form());
     }

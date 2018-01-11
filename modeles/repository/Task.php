@@ -282,8 +282,8 @@ class Repository_Task extends ORM_Task
         $project_id     = $params['project'];
         $task_name      = $params['task_name'];
         $priority       = isset($params['priority']) ? $params['priority'] : 0;
-        $dateStartSave  = Model::dateFormat($params['dateStart']);
-        $dateEndSave    = Model::dateFormat($params['dateEnd']);
+        $dateStartSave  = $this->dateFormat($params['dateStart']);
+        $dateEndSave    = $this->dateFormat($params['dateEnd']);
         $repeat         = $params['repeat'];
         $interspace     = empty($params['interspace']) ? null : $params['interspace'];
         $reiterateEnd   = $params['reiterateEnd'];
@@ -321,4 +321,19 @@ class Repository_Task extends ORM_Task
         return $task->save();
     }
 
+    public function dateFormat($date)
+    {
+        if (strpos($date, '/'))
+        {
+            $arrayDateTime   = explode(' ', $date); // Time
+            $arrayDate       = explode('/', $arrayDateTime[0]);
+            if (isset($arrayDateTime[1])){
+                return $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . ' ' . $arrayDateTime[1];
+            }
+            else {
+                return $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0];
+            }
+        }
+        return $date;
+    }
 }

@@ -21,7 +21,7 @@ class IndexController extends Controller
                 $mot  = trim(strtolower($mot));
                 if (!empty($mot))
                 {
-                    $find = Model::factory('ia')->load(false, array('mot' => $mot));
+                    $find = Model::factory('ia')->setWhere(array('mot' => $mot))->load();
 
                     if (!$find)
                     {
@@ -170,8 +170,11 @@ class IndexController extends Controller
             header('Location: http://' . $_SERVER['SERVER_NAME'] . '/login');
             exit();
         }
+        $test = Model::factory('task')->getPerformed();
+        var_dump($test);
+        exit;
         
-        $projects = Model::factory('project')->load(array('active' => 1));
+        $projects = Model::factory('project')->setWhere(array('active' => 1))->load();
         if (!isset($_SESSION['project']))
         {
             $_SESSION['project'] = array();

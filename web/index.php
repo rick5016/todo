@@ -16,7 +16,9 @@ session_start();
 // includes the system routes. Define your own routes in this file
 include(ROOT_PATH . '/config/routes.php');
 
-require_once ROOT_PATH . '/library/twig/Autoloader.php';
+require_once ROOT_PATH . '/vendor/autoload.php';
+//require_once ROOT_PATH . '/library/twig/Autoloader.php';
+//require_once ROOT_PATH . '/vendor/twig/twig/lib/Twig/Autoloader.php';
 require_once ROOT_PATH . '/form/Autoloader.php';
 require_once ROOT_PATH . '/modeles/Autoloader.php';
 
@@ -66,6 +68,6 @@ function autoloader($className)
 
 // activates the autoloader
 spl_autoload_register('autoloader');
-
+unset($_SESSION['query']);
 $router = new Router($routes);
 $router->execute();

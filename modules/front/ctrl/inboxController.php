@@ -30,7 +30,7 @@ class Front_InboxController extends Controller
             }
         }
 
-        $form = new Form_task($task, Model::factory('project')->load(false));
+        $form = new Form_task($task, Model::factory('project')->load());
         if ($this->getRequest()->isPost())
         {
 
@@ -52,9 +52,6 @@ class Front_InboxController extends Controller
         $form     = new Form_filtres();
         $form->isValid($this->getRequest());
 
-        $test = ORM_Repository::factory('task')->getPerformed();
-        var_dump($test);
-        exit;
         foreach (ORM_Repository::factory('task')->loadInbox($this->getRequest()) as $task)
         {
             $task->setDateAffichage();

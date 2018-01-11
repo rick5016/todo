@@ -5,7 +5,7 @@ class Repository_Project
     
     public function load()
     {
-        return Project::factory('project')->load(false);
+        return Project::factory('project')->load();
     }
     
     function getTasks()
