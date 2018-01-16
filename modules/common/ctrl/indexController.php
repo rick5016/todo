@@ -170,9 +170,6 @@ class IndexController extends Controller
             header('Location: http://' . $_SERVER['SERVER_NAME'] . '/login');
             exit();
         }
-        $test = Model::factory('task')->getPerformed();
-        var_dump($test);
-        exit;
         
         $projects = Model::factory('project')->setWhere(array('active' => 1))->load();
         if (!isset($_SESSION['project']))

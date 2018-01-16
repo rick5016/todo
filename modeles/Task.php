@@ -39,14 +39,14 @@ class ORM_Task extends Model
         return 'D';
     }
     
-    function getInterspace()
-    {
-        if ($this->reiterate == 2) {
-            return $this->interspace*7;
-        }
-        
-        return $this->interspace;
-    }
+//    function getInterspace()
+//    {
+//        if ($this->reiterate == 2) {
+//            return $this->interspace*7;
+//        }
+//        
+//        return $this->interspace;
+//    }
     
     /**
      * Si la date d'aujoud'hui ce situe entre le début et la fin de l'événement alors la date d'affiche est la date d'aujourd'hui
@@ -112,106 +112,6 @@ class ORM_Task extends Model
             exit;
         }
     }
-    
-    /*
-    function setDateStart($dateStart)
-    {
-        if (strpos($dateStart, '/'))
-        {
-            $arrayDateTime   = explode(' ', $dateStart); // Time
-            $arrayDate       = explode('/', $arrayDateTime[0]);
-            if (isset($arrayDateTime[1])) {
-                $this->dateStart = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . ' ' . $arrayDateTime[1];
-            } else {
-                $this->dateStart = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . " 00:00:00";
-            }
-        }
-        else {
-            $this->dateStart = $dateStart;
-        }
-    }
-
-    function setDateEnd($dateEnd)
-    {
-        if (strpos($dateEnd, '/'))
-        {
-            $arrayDateTime   = explode(' ', $dateEnd); // Time
-            $arrayDate       = explode('/', $arrayDateTime[0]);
-            if (isset($arrayDateTime[1])) {
-                $this->dateEnd = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . ' ' . $arrayDateTime[1];
-            } else {
-                $this->dateEnd = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . " 00:00:00";
-            }
-        }
-        else {
-            $this->dateEnd = $dateEnd;
-        }
-    }
-    
-    function setDateStartOrigine($dateStart)
-    {
-        if (strpos($dateStart, '/'))
-        {
-            $arrayDateTime   = explode(' ', $dateStart); // Time
-            $arrayDate       = explode('/', $arrayDateTime[0]);
-            if (isset($arrayDateTime[1])) {
-                $this->dateStartOrigine = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . ' ' . $arrayDateTime[1];
-            } else {
-                $this->dateStartOrigine = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . " 00:00:00";
-            }
-        }
-        else {
-            $this->dateStartOrigine = $dateStart;
-        }
-    }
-
-    function setDateEndOrigine($dateEnd)
-    {
-        if (strpos($dateEnd, '/'))
-        {
-            $arrayDateTime   = explode(' ', $dateEnd); // Time
-            $arrayDate       = explode('/', $arrayDateTime[0]);
-            if (isset($arrayDateTime[1])) {
-                $this->dateEndOrigine = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . ' ' . $arrayDateTime[1];
-            } else {
-                $this->dateEndOrigine = $arrayDate[2] . '-' . $arrayDate[1] . '-' . $arrayDate[0] . " 00:00:00";
-            }
-        }
-        else {
-            $this->dateEndOrigine = $dateEnd;
-        }
-    }
-    
-    function getDateStart($display = false)
-    {
-        if ($display)
-        {
-            $tab = explode('-', $this->dateStart);
-            return $tab[1] . '/' . $tab[0] . '/' . $tab[2];
-        }
-        
-        return $this->dateStart;
-    }
-
-    function getDateEnd($display = false)
-    {
-        if ($display)
-        {
-            $tab = explode('/', $this->dateEnd);
-            return $tab[1] . '/' . $tab[0] . '/' . $tab[2];
-        }
-        
-        return $this->dateEnd;
-    }
-    
-    function getPerformes()
-    {
-        if (isset($this->performes)) {
-            return $this->performes;
-        }
-        
-        return null;
-    }*/
     
     function performe()
     {
@@ -294,12 +194,12 @@ class ORM_Task extends Model
             } elseif ($reiterate == 4) {
                 $reiterate_type = 'Y';
             }
-
+            
             $dateTime->add(new DateInterval('P' . $interval . $reiterate_type));
             
             $date = $dateTime->format('Y-m-d');
         }
-            
+        
         if ($search == 'next') {
             return $date . ' '. $dateTimeOrigine->format('H:i:s');
         } else {

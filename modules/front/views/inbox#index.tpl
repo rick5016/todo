@@ -18,14 +18,14 @@
   $(function() {
     $('#date_passee').change(function() {
       $("#filtrer").submit();
-    })
+    });
     $('#date_future').change(function() {
       $("#filtrer").submit();
-    })
+    });
     $('#details').change(function() {
       $("#filtrer").submit();
-    })
-  })
+    });
+  });
 </script>
 <form method="post" id="filtrer">
     {% if filtre is not defined or filtre != 'today' %}
@@ -165,7 +165,7 @@
                 
             {% if details %}
                 <div style="float:left;height:100%;padding-top: 5px;padding-left: 0;">
-                    {% if task.reiterate == 1 %} - Tous les {{ task.interspace }} jour(s){% elseif task.reiterate == 2 %} - Toutes les {{ task.interspace }} semaine(s){% elseif task.reiterate == 3 %} - Tous les {{ task.interspace }} mois{% elseif task.reiterate == 4 %} - Toutes les {{ task.interspace }} année(s){% endif %}
+                    {% if task.reiterate == 0 %} Unique {% elseif task.reiterate == 1 %} - Tous les {{ task.interspace }} jour(s){% elseif task.reiterate == 2 %} - Toutes les {{ task.interspace }} semaine(s){% elseif task.reiterate == 3 %} - Tous les {{ task.interspace }} mois{% elseif task.reiterate == 4 %} - Toutes les {{ task.interspace }} année(s){% endif %}
                 </div>
             {% else %}
                 {% if task.dateStart|date('d/m/Y', timezone="Europe/Paris") != task.dateEnd|date('d/m/Y', timezone="Europe/Paris") %}
@@ -215,10 +215,9 @@
     function deleteTask(button)
     {
         var infos = button.attr('id').split('___');
-        var id = infos[1];
         
         $('#dialogDelete').attr('title', 'Supprimer une tâche');
-        $('#dialogDelete').html('Etes-vous sûr de vouloir supprimer la tâche : ' + infos[0] + ' ?')
+        $('#dialogDelete').html('Etes-vous sûr de vouloir supprimer la tâche : ' + infos[0] + ' ?');
         
         $('#dialogDelete').dialog({
             resizable: false,

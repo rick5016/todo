@@ -108,6 +108,11 @@ class Model
         return $return;
     }
     
+    public function truncate()
+    {
+        return $this->execute($this->dbh->prepare('truncate table ' . $this->bdd_name));
+    }
+    
     /**
      * INSERT OR UPDATE
      * l'enregistrement des enfants (et les transactions) doivent Ãªtre gÃ©rÃ© dans les classe d'ORM respective
@@ -142,8 +147,11 @@ class Model
             $query1 = 'INSERT INTO ' . $this->bdd_name . '(';
             foreach ($this->attributs as $key => $attribut)
             {
-                if (($key != 'created' && $key != 'updated' && $key != 'id') || ($key == 'id' && $this->getId() != null)) {
-                    $query1 .= $key . ", ";
+                if (($key != 'created' && $key != 'updated' && $key != 'id') || ($key == 'id' && $this->getId() != null))
+                {
+                    if (isset($this->$key)) {
+                        $query1 .= $key . ", ";
+                    }
                 }
             }
             $query2 = substr($query1, 0, -2);
@@ -151,7 +159,9 @@ class Model
             foreach ($this->attributs as $key => $attribut)
             {
                 if (($key != 'created' && $key != 'updated' && $key != 'id') || ($key == 'id' && $this->getId() != null)) {
-                    $query2 .= ':' . $key . ", ";
+                    if (isset($this->$key)) {
+                        $query2 .= ':' . $key . ", ";
+                    }
                 }
             }
             $query = substr($query2, 0, -2);
@@ -160,14 +170,17 @@ class Model
             $stmt  = $this->dbh->prepare($query);
             foreach ($this->attributs as $key => $attribut)
             {
-                if (($key != 'created' && $key != 'updated' && $key != 'id') || ($key == 'id' && $this->getId() != null)) {
-                    $stmt->bindValue(':' . $key, $this->{'get' . ucfirst($key)}());
+                if (($key != 'created' && $key != 'updated' && $key != 'id') || ($key == 'id' && $this->getId() != null))
+                {
+                    if (isset($this->$key)) {
+                        $stmt->bindValue(':' . $key, $this->{'get' . ucfirst($key)}());
+                    }
                 }
             }
-//            "INSERT INTO task(idProject, name, priority, dateStart, dateEnd, reiterate, interspace, reiterateEnd, untilDate, untilNumber) "
-//            . "VALUES (:idProject, :name, :priority, :dateStart, :dateEnd, :reiterate, :interspace, :reiterateEnd, :untilDate, :untilNumber)"
+            
             $this->execute($stmt);
-            if ($this->getId() == null) {
+            
+            if ($this->getId() === null) {
                 $this->setId($this->dbh->lastInsertId());
             }
         }
@@ -213,7 +226,7 @@ class Model
             $stmt->bindValue(':id', $id);
             $this->execute($stmt);
 
-            $this->dbh->commit();
+            return $this->dbh->commit();
         }
         catch (PDOException $e) {
             throw new Exception($e->getMessage());
@@ -292,7 +305,7 @@ class Model
         }
         else
         {
-            $sqlSelect = 'SELECT ';
+            $sqlSelect = 'select ';
             $sqlSelect .= implode(', ', array_filter(array_values($this->select)));
 
             return $sqlSelect;
@@ -454,22 +467,24 @@ class Model
         if (!empty($this->where))
         {
             $query = " where";
-            foreach ($this->where as $key => $value) {
+            foreach ($this->where as $key => $value)
+            {
                 if (is_int($key)) {
                     $query .= ' ' . $value . ' and ';
                 } else {
                     $query .= ' ' . $key . ' = :' . $key . ' and ';
                 }
             }
-            $query = substr($query, 0, -5);
+            return substr($query, 0, -5);
         }
 
-        return $query;
+        return '';
     }
 
     public function getSQLLoad($foreing_keys)
     {
-        $this->query = $this->getSQLSelect($this, $foreing_keys) . $this->getSQLFrom();
+        $this->query = $this->getSQLSelect($this, $foreing_keys);
+        $this->query .= $this->getSQLFrom();
         $this->query = $this->getSQLJoin($this, $this->query, $foreing_keys);
         $this->query .= $this->getSQLWhere();
         $_SESSION['query'][] = $this->query;
