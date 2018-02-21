@@ -89,7 +89,7 @@ class Repository_Task extends ORM_Task
         
         if (isset($id))
         {
-            $task = $this->loadOne(false, array('id' => $id));
+            $task = $this->setWhere(array('id' => $id))->loadOne();
             if (isset($task)) {
                 $task->performe();
                 return true;

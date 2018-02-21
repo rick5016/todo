@@ -222,7 +222,7 @@
             beforeSend	: function () {
                 $('#warpper').show();
             },
-            url		: 'http://projetdetest.dev.s2h.corp/ia',
+            url		: '/ia',
             async	: true,
             dataType 	: 'json',
             data 		: {
@@ -248,7 +248,7 @@
             beforeSend	: function () {
                 $('#warpper').show();
             },
-            url		: 'http://projetdetest.dev.s2h.corp/projectsactivation',
+            url		: '/projectsactivation',
             async	: true,
             dataType 	: 'json',
             data 		: {
@@ -274,7 +274,7 @@
             beforeSend	: function () {
                 $('#warpper').show();
             },
-            url		: 'http://projetdetest.dev.s2h.corp/projectscolor',
+            url		: '/projectscolor',
             async		: true,
             dataType 	: 'json',
             data 		: {
@@ -303,7 +303,7 @@
             beforeSend	: function () {
                 $('#warpper').show();
             },
-            url		: 'http://projetdetest.dev.s2h.corp/projects',
+            url		: '/projects',
             async		: true,
             dataType 	: 'json',
             data 		: {

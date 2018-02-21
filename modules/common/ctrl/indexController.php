@@ -229,7 +229,7 @@ class IndexController extends Controller
         $idProject = $this->getRequest()->getParam('id');
         $color     = $this->getRequest()->getParam('color');
 
-        $project = Model::factory('project')->loadOne(false, array('id' => (int) $idProject));
+        $project = Model::factory('project')->setWhere(array('id' => (int) $idProject))->loadOne();
         if ($project) {
             $project->setColor($color);
             $project->save();

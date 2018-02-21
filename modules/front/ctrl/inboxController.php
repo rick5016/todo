@@ -87,9 +87,9 @@ class Front_InboxController extends Controller
             throw new Exception('id manquant');
         }
         
-        Model::factory('task')->delete(true, (int) $id);
+        Model::factory('task')->delete(array('performes'), (int) $id);
         
-        echo json_encode('');
+        header('Location: ' . $this->getRequest()->getReferer());
         exit;
     }
 

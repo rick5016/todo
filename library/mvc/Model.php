@@ -209,15 +209,18 @@ class Model
 
             $this->dbh->beginTransaction();
             
-            if ($foreing_keys)
+            if ($foreing_keys !== false && is_array($foreing_keys))
             {
-                foreach ($this->foreign_keys as $datas)
+                foreach ($this->foreign_keys as $key => $datas)
                 {
-                    // 'calendars' => array('calendar','id','idTask')
-                    $query = "DELETE from " . $datas[0] . " where " . $datas[2] . " = :id";
-                    $stmt  = $this->dbh->prepare($query);
-                    $stmt->bindValue(':id', $id);
-                    $this->execute($stmt);
+                    if (in_array($key, $foreing_keys))
+                    {
+                        // 'calendars' => array('calendar','id','idTask')
+                        $query = "DELETE from " . $datas[0] . " where " . $datas[2] . " = :id";
+                        $stmt  = $this->dbh->prepare($query);
+                        $stmt->bindValue(':id', $id);
+                        $this->execute($stmt);
+                    }
                 }
             }
 
